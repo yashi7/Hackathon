@@ -1,0 +1,231 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wardrobe</title> 
+    <link rel="stylesheet" href="{% static 'css/view_wardrobe.css' %}">
+    <style>
+   /* General styles for the page */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    color: #333;
+    background-color: #5e0707;
+    line-height: 1.6;
+}
+
+.header {
+    background-color: #fff;
+    padding: 20px 0;
+    border-bottom: 1px solid #e6e6e6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    margin: auto;
+}
+
+.logo-img {
+    width: 80px;
+    height: auto;
+    border-radius: 50%;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+ 
+
+h2 {
+    text-align: center;
+    font-size: 2.8rem;
+    color: #5e0707;
+    margin-bottom: 20px;
+}
+  
+.footer {
+    background-color: #5e0707;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 1rem;
+}
+.add-fav-button {
+    padding: 2px 4px 5px  4px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+    background-color: #62030c;
+    color: white;
+}
+.add-fav-button:hover {
+    background-color: #63050e;
+}
+a{
+    text-decoration: none;
+}
+
+.style-tips {
+        background-color: #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+    }
+    
+    .style-tips h3 {
+        color: #5e0707;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ffffff;
+        padding-bottom: 5px;
+    }
+    
+    .style-tips p {
+        color: #5e0707;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    
+    .style-tips ul { 
+        padding-left: 20px;
+        color: #5e0707;
+        list-style: square;
+        text-align: left;
+        margin-left: 30%;
+    }
+    
+    .style-tips ul li {
+        margin-bottom: 10px;
+        font-size: 1em;
+    }
+    
+    .style-tips ul li::marker {
+        color: #5e0707;
+    }
+
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Closet Logo" class="logo-img">
+                <!-- <button  style="border: 2px solid black; border-radius: 50%; cursor: pointer; aspect-ratio: 1 / 1; font: bold;background-color: #5e0707; color: white;"onclick="onBgColorSelectorClick()" id="change_bg_color"> {{user.username}}</script></button> -->
+                <h1 style="color: black;">Your Wardrobe</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'recommendation' %}">Recommend</a></li>
+                <li><a href="{% url 'favourite' %}">Favourites</a></li>
+                <li><a href="{% url 'upload' %}">Upload</a></li> 
+                <li><a href="{% url 'profile' %}">Profile</a></li> 
+                
+
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                    
+                </li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <main class="wardrobe">
+        <h2>Your Wardrobe Items</h2>
+        <p class="wardrobe-description">
+            Welcome to your personal wardrobe! Here you can view and manage your clothing items, ensuring you're always
+            stylishly prepared for any occasion.
+        </p>
+        <div class="wardrobe-grid">
+            {% if items %}
+            {% for item in items %}
+            <div class="wardrobe-item">
+                
+                <img src="/media/{{ item.image_name }}" alt="Wardrobe Item" style="max-width: 60%; height: 60%;">
+                <div style="text-align: left; position: relative; bottom: 0;">
+                    <p><strong>Image Name:</strong> {{ item.image_name }}</p> 
+                    {% with item.category_set.first as cat %}
+                    
+                    {% if cat %}
+                    
+                    <form action="{% url 'remove_from_wardrobe' cat.c_id %}" method="POST" >
+                        {% csrf_token %}
+                        <div style="display: flex;justify-content: space-between;"> 
+                        <button type="submit"   class="add-fav-button" style=" padding: auto; height: 20px; font-size: medium;">Remove</button>
+                        <a href="{% url 'add_to_favorites' cat.c_id %}" class="add-fav-button" style="font-size: medium;height: 20px;background-color: rgb(84, 7, 3);">Add to Fav</a>
+                        </div>
+                    </form>  
+                    
+                    
+                    <p><strong>Category:</strong> {{ cat.Category }}</p>
+                    <p><strong>Color:</strong> {{ cat.Color }}</p>
+                    <p><strong>Occasion:</strong> {{ cat.Occassion }}</p> 
+                    {% else %}
+                    <p>No category assigned.</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+                
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="no-items">You haven't uploaded any items yet.</p>
+            {% endif %}
+        </div>
+
+        <section class="style-tips">
+            <h3>Style Tips</h3>
+            <p>
+                Need inspiration? Here are some quick tips for putting together great outfits:
+            </p>
+            <ul>
+                <li>Mix and match colors that complement each other.</li>
+                <li>Don't hesitate to layer pieces for added style and warmth.</li>
+                <li>Accessorize wisely to elevate any outfit.</li>
+                <li>Remember to dress according to the occasion for the best impact!</li>
+            </ul>
+        </section>
+
+        <section class="call-to-action">
+            <h3 style="color: #5e0707;">Ready to Add More?</h3>
+            <p>
+                Enhance your wardrobe further by uploading more items! Keep your style fresh and dynamic.
+            </p>
+            <a href="{% url 'upload' %}" class="cta-button">Upload More Items</a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Closet App. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

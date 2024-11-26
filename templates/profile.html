@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Closet</title>
+    <link rel="icon" href="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Customization Section Styles */
+        #cust_bg{
+            display: none;
+        }
+        .customization {
+            position: fixed; /* Change to fixed positioning */
+            top: 20px; /* Distance from the top of the viewport */
+            left: 50%; /* Align to the center horizontally */
+            transform: translateX(-50%); /* Adjust position to center the element */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 10px;
+        }
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Closet Logo" class="logo-img">
+                <h1></h1>
+                <button  style="border: 2px solid black; border-radius: 50%; cursor: pointer; aspect-ratio: 1 / 1; font: bold;background-color: #5e0707; color: white;"onclick="onBgColorSelectorClick()" id="change_bg_color"> {{user.username}}</script></button>
+                <h1>CLOSET</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="#contactt">Contact</a></li>
+                <li><a href="{% url 'recommendation' %}">Recommend</a></li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                    
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="customization" id="cust_bg">
+        <h3>Customize Background
+            <button  style="border: 1px solid black; border-radius: 50%; cursor: pointer;"onclick="onBgColorSelectorClick()" name="change bg color"> X </button>
+        </h3>
+        <div class="color-palette">
+            <div class="color-option" style="background-color: #c50343;" onclick="changeBackground('#c50343')"></div>
+            <div class="color-option" style="background-color: #5e0707;" onclick="changeBackground('#5e0707')"></div>
+            <div class="color-option" style="background-color: #eda305;" onclick="changeBackground('#eda305')"></div>
+            <div class="color-option" style="background-color: #71c906;" onclick="changeBackground('#71c906')"></div> 
+            <div class="color-option" style="background-color: #05a091;" onclick="changeBackground('#05a091')"></div>
+            <div class="color-option" style="background-color: #04045c;" onclick="changeBackground('#04045c')"></div>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Welcome, {{ user.username }}</h2>
+            <p>Manage your wardrobe, get outfit recommendations, and discover insights.</p>
+        </div>
+    </section>
+
+    <section class="profile-options" id="profile-options">
+        <h2>Your Dashboard</h2>
+        <div class="feature-cards">
+            <div class="card">
+                <h3>Upload Your Wardrobe</h3>
+                <p>Digitize and organize your clothing items effortlessly.</p>
+                <a href="{% url 'upload' %}" class="cta-button">Upload</a>
+            </div>
+            <div class="card">
+                <h3>Get Recommendations</h3>
+                <p>Receive personalized outfit ideas based on your wardrobe.</p>
+                <a href="{% url 'recommendation' %}" class="cta-button">Recommend</a>
+            </div>
+            <div class="card">
+                <h3>Wardrobe Insights</h3>
+                <p>Analyze your clothing trends and style preferences.</p>
+                <br>
+                <a href="{% url 'insights' %}" class="cta-button">Insights</a>
+            </div>
+            <div class="card">
+                <h3>Favorite Outfits</h3>
+                <p>Save and manage your favorite outfits.</p>
+                <br>
+                <a href="{% url 'favourite' %}" class="cta-button">Favourite</a>
+            </div>
+            <div class="card">
+                <h3>View uploaded items</h3>
+                <p>Manage your profile, privacy settings, and more.</p>
+                <a href="{% url 'view_wardrobe' %}" class="cta-button">View Wardrobe</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>Contact Us: <a href="mailto:support@closetapp.com">support@closetapp.com</a></p>
+        <p>Follow us on <a href="#">Instagram</a>, <a href="#">Twitter</a>, and <a href="#">Facebook</a></p>
+    </footer>
+
+    <script src="{% static 'script.js' %}"></script>
+    <script>
+        function changeBackground(color) { 
+            document.body.style.backgroundColor = color;
+ 
+            const footers = document.getElementsByTagName("footer");
+            for (let i = 0; i < footers.length; i++) {
+                footers[i].style.backgroundColor = color;
+            }
+
+            const links = document.getElementsByTagName("a");
+            for (let j = 3; j < links.length; j++) {
+                links[j].style.backgroundColor = color;
+            } 
+            document.getElementById("change_bg_color").style.backgroundColor=color;
+            
+        }
+
+        function onBgColorSelectorClick(){
+            const custBgElement = document.getElementById("cust_bg");
+
+            // Check the current display state and toggle it
+            if (custBgElement.style.display === "block") {
+                custBgElement.style.display = "none"; // Hide the element
+            } else {
+                custBgElement.style.display = "block"; // Show the element
+            }
+
+        }
+    </script>
+</body>
+</html>

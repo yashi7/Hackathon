@@ -1,0 +1,373 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wardrobe Insights</title>
+    <link rel="stylesheet" href="{% static 'css/insights.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script> <!-- Correctly reference the plugin -->
+
+    <style>
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+        }
+
+        .logo-img {
+            width: 80px; 
+            height: auto; 
+            border-radius: 50%;
+        }
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#home"><img
+                        src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}"
+                        alt="Closet Logo" class="logo-img"></a>
+                <h1>Wardrobe Insights</h1>
+            </div> 
+            <ul class="nav-links">
+                <li><a href="{% url 'view_wardrobe' %}">Your Wardrobe</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                    
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="insights">
+        <h2>Wardrobe Insights</h2>
+        <p class="intro">Explore trends, statistics, and insights into your wardrobe to enhance your style and fashion choices.</p>
+
+        <!-- Section: Most Worn Items (Bar Chart) -->
+        <section class="insight-section">
+            <div class="personal_insights" >
+                <h3>Your Recommendations</h3>
+                <canvas id="recomendationCategoryCharts" style="height: 300px;"></canvas> <!-- Chart.js will render here -->
+            </div>
+            <!-- <div class="world_trend">
+                <h3>Wardrobe Trends</h3>
+                <canvas id="wardrobechart"></canvas>  
+            </div> -->
+        </section>
+
+        <!-- Section: Color Distribution (Pie Chart) -->
+        <section class="insight-section">
+            <div class="personal_insights">
+                <h3>Your Color Distribution</h3>
+                <canvas id="colorDistributionChart"></canvas>
+            </div>
+            <!-- <div class="world_trend">
+                <h3>Wardrobe Color Trends</h3>
+                <canvas id="colorDistributionChartWardrobe"></canvas>
+                
+            </div> -->
+        </section>
+
+         
+        <!-- Section: Favorite Categories (Bar Chart) -->
+        <section class="insight-section">
+            <div class="personal_insights" style="width: 100%; ">
+                <h3>Your Favorite Composition</h3>
+                <div style="display: flex;height: 300px; justify-content: space-around; ">
+                <canvas id="favColorDistributionChart"style='margin-right:10%;'> </canvas>
+                <canvas id="favCategoryCharts"  > Category Distribution</canvas> 
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Closet App. All rights reserved.</p>
+    </footer>
+
+    <!-- Chart.js Script to Render Charts -->
+     
+    <script>
+
+         // Fetch data passed from the view
+        const occasions = {{ occasions|safe }};
+        const counts_of_ocassions = {{ counts_of_ocassions|safe }};
+        console.log(occasions,counts_of_ocassions);
+        // Create bar chart using Chart.js
+        const ctx = document.getElementById('recomendationCategoryCharts').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: occasions,
+                datasets: [{
+                    label: 'Cloth Selection Counts',
+                    data: counts_of_ocassions,
+                    backgroundColor:  ['#FF6384', '#36A2EB', '#FFCE56'],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} selections`;
+                            }
+                        }
+                    },
+                    // Custom plugin to add description text
+                    title: {
+                        display: true,
+                        text: 'Category Composition in Wardrobe'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true ,
+                        title: {
+                            display: true,
+                            text: 'Counts of Cloths'  // Label for Y-axis
+                        }
+                    },
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'Category of Cloths'  // Label for Y-axis
+                        }
+                    }
+                }
+            }
+        });
+
+        // const wardrobe_occassion = {{ occasions_wardrobe|safe }};
+        // const counts_of_wardrobe_items = {{ counts_of_wardrobe_items|safe }};
+        // console.log(occasions,counts_of_ocassions);
+        // // Create bar chart using Chart.js
+        // const ctx_wardrobe = document.getElementById('wardrobechart').getContext('2d');
+        // new Chart(ctx_wardrobe, {
+        //     type: 'bar',
+        //     data: {
+        //         labels: wardrobe_occassion,
+        //         datasets: [{
+        //             label: 'Cloth Selection Counts',
+        //             data: counts_of_wardrobe_items,
+        //             backgroundColor:  ['#FF6384', '#36A2EB', '#FFCE56'],
+        //             borderColor: 'rgba(75, 192, 192, 1)',
+        //             borderWidth: 1
+        //         }]
+        //     },
+        //     options: {
+        //         plugins: {
+        //             legend: { display: false },
+        //             tooltip: {
+        //                 callbacks: {
+        //                     label: function(context) {
+        //                         return `${context.label}: ${context.raw} selections`;
+        //                     }
+        //                 }
+        //             },
+        //             // Custom plugin to add description text
+        //             title: {
+        //                 display: true,
+        //                 text: 'Category Composition in Wardrobe'
+        //             }
+        //         },
+        //         scales: {
+        //             y: { beginAtZero: true ,
+        //                 title: {
+        //                     display: true,
+        //                     text: 'Counts of Cloths'  // Label for Y-axis
+        //                 }
+        //             },
+        //             x:{
+        //                 title: {
+        //                     display: true,
+        //                     text: 'Category of Cloths'  // Label for Y-axis
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
+
+
+
+        const colors = {{ colors|safe }};
+        const counts_of_colors = {{counts_of_colors|safe}};
+
+        const ctx_2 = document.getElementById('colorDistributionChart').getContext('2d');
+        new Chart(ctx_2, {
+            type: 'pie',
+            data: {
+                labels: colors,
+                datasets: [{
+                    label: 'Cloth Selection Counts',
+                    data: counts_of_colors,
+                    backgroundColor: colors,
+                    hoverOffset: 4,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        position: 'left',
+                        labels: {
+                            generateLabels: (chart) => {
+                                const data = chart.data;
+                                return data.labels.map((label, index) => {
+                                    const value = data.datasets[0].data[index];
+                                    const total = data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[index],
+                                        strokeStyle: data.datasets[0].borderColor,
+                                        lineWidth: 1,
+                                        hidden: false,
+                                        index
+                                    };
+                                });
+                            },
+                        },
+                    },
+                    datalabels: {
+                        display: false, // Disable internal labels
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw} selections`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Colors Composition in Wardrobe'
+                    }
+                }
+            }
+             
+        });
+  
+        const fav_colors = {{ fav_colors|safe }};
+        const fav_counts_of_colors = {{fav_counts_of_colors|safe}};
+
+        const ctx_fav = document.getElementById('favColorDistributionChart').getContext('2d');
+        new Chart(ctx_fav, {
+            type: 'pie',
+            data: {
+                labels: fav_colors,
+                datasets: [{
+                    label: 'Cloth Selection Counts',
+                    data: fav_counts_of_colors,
+                    backgroundColor: fav_colors,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },options: {
+                plugins: {
+                    legend: {
+                        position: 'left',
+                        labels: {
+                            generateLabels: (chart) => {
+                                const data = chart.data;
+                                return data.labels.map((label, index) => {
+                                    const value = data.datasets[0].data[index];
+                                    const total = data.datasets[0].data.reduce((sum, val) => sum + val, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return {
+                                        text: `${label}: ${percentage}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[index],
+                                        strokeStyle: data.datasets[0].borderColor,
+                                        lineWidth: 1,
+                                        hidden: false,
+                                        index
+                                    };
+                                });
+                            },
+                        },
+                    },
+                    datalabels: {
+                        display: false, // Disable internal labels
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw} selections`;
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Color Composition in Favorite'
+                    }
+                }
+            } 
+             
+        });
+
+        const fav_occasions = {{ fav_cat|safe }};
+        const fav_counts_of_ocassions = {{ fav_counts_of_cat|safe }};
+        console.log(occasions,counts_of_ocassions);
+        // Create bar chart using Chart.js
+        const ctx_fav_cat = document.getElementById('favCategoryCharts').getContext('2d');
+        new Chart(ctx_fav_cat, {
+            type: 'bar',
+            data: {
+                labels: fav_occasions,
+                datasets: [{
+                    label: '',
+                    data: fav_counts_of_ocassions,
+                    backgroundColor:  ['#FF6384', '#36A2EB', '#FFCE56'],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },options: {
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw} selections`;
+                            }
+                        }
+                    },
+                    // Custom plugin to add description text
+                    title: {
+                        display: true,
+                        text: 'Category Composition in Favorites'
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true ,
+                        title: {
+                            display: true,
+                            text: 'Counts of Cloths'  // Label for Y-axis
+                        }
+                    },
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'Category of Cloths'  // Label for Y-axis
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
+ 

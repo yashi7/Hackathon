@@ -1,0 +1,75 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Favorite Outfits</title>
+    <link rel="stylesheet" href="{% static 'css/favourite.css' %}">
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo" style="display: flex; justify-content:space-between; width: 25%;">
+                <a href="#" style="margin: 1%;"><img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Logo" class="logo-img"></a>
+                <h1>Favorite Outfits</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'view_wardrobe' %}">Your Wardrobe</a></li>
+                <li><a href="{% url 'upload' %}">Upload</a></li>
+                <li><a href="{% url 'recommendation' %}">Recommend</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                    
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="favorite-outfits">
+        <h2>Your Favorite Outfits</h2>
+        <p class="intro">
+            Discover the outfits you love the most! You can easily remove or edit them here.
+        </p>
+
+        <div class="outfits-grid">
+            {% if favorite_items %}
+            {% for outfit in favorite_items %}
+            <div class="outfit-card">
+                <img src="/media/{{ outfit.image_name }}" alt="Favorite Outfit" style="height: 60%;">
+                <div id="fav_description" style=" position: relative; flex: bottom;">
+                    <h3>{{ outfit.category }}</h3>
+                    <p><strong>Color:</strong> {{ outfit.color }}</p>
+                    <p><strong>Occasion:</strong> {{ outfit.occasion }}</p>
+                    <!-- <p><strong>ID:</strong> {{ outfit.id }}</p> Debug line to show ID -->
+                    <div class="button-group">
+                        <form action="{% url 'remove_outfit' outfit.f_id %}" method="POST" class="remove-form"
+                            style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-button">Remove</button>
+                        </form>
+                    </div>
+                </div>
+        
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>You haven't added any favorite outfits yet.</p>
+            {% endif %}
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 Closet App. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

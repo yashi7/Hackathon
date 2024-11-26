@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Wardrobe - Closet</title>
+    <link rel="stylesheet" href="{% static 'css/upload.css'%}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<style>
+    /* Optional: Add some basic styling */
+    .image-gallery {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 10px;
+        width: 70%;
+        margin-left: 15%;
+    }
+
+    .image-item {
+        flex: 1 1 200px;
+        margin: 10px;
+    }
+
+    .image-item img {
+        width: 50%;
+        height: auto;
+        margin-left: 10%;
+        margin-right: -50%;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px; 
+    }
+
+    .logo-img {
+        width: 80px; 
+        height: auto; 
+        border-radius: 50%;
+    }
+
+</style>
+<body>
+    <header class="header">
+        <nav class="navbar"> 
+                <div class="logo">
+                    <a href="#home"><img
+                            src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}"
+                            alt="Closet Logo" class="logo-img"></a>
+                    <h1>Recommendations</h1>
+                </div>  
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'aboutus' %}">About</a></li>
+                <li><a href="{% url 'view_wardrobe' %}">Your Wardrobe</a></li>
+                <li><a href="{% url 'favourite' %}">Favourites</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                    
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="upload-section">
+        <h2 > GET  RECOMMENDATIONS  </h2>
+        <p>Tell us what's the occasssion and we'll recommend you outfits especially currated for you from your own wardrobe</p>
+        
+        <form class="upload-form"  method="POST">
+            {% csrf_token %}
+            <!-- <label for="item-image">Upload Image:</label>
+            <input type="file" id="item-image" name="item-image" accept="image/*" required> -->
+            
+            <!-- <label for="item-name">Item Name:</label>
+            <input type="text" id="item-name" name="item-name" placeholder="e.g., Red Dress" required> -->
+            
+            <label for="occasion">Occasion:</label>
+            <select id="occasion" name="occassion" required>
+                <option value="Casual">Casual</option>
+                <option value="Ethnic">Ethnic</option>
+                <option value="Party">Party</option> 
+                <option value="Formal">Formal</option>
+                <option value="Smart Casual">Smart Casual</option>
+                <option value="Sports">Sports</option> 
+                <option value="Travel">Travel</option> 
+            </select>
+<!--             
+            <label for="item-color">Color:</label>
+            <input type="text" id="item-color" name="item-color" placeholder="e.g., Red">
+            
+            <label for="item-brand">Brand:</label>
+            <input type="text" id="item-brand" name="item-brand" placeholder="e.g., Zara">
+            
+            <label for="item-occasion">Occasion:</label>
+            <input type="text" id="item-occasion" name="item-occasion" placeholder="e.g., Casual, Party"> -->
+
+            <button type="submit" class="upload-button">Recommend</button>
+        </form>
+    </section>
+    <section>
+        <h3 style="margin-left: 10%;">Recommendations for {{ occassion }}</h3>    
+        <div style="width: 75%; margin-left: 9%; border: 2px solid rgba(0, 0, 0, 0.404);"></div>
+        {% if recommendations %}
+        <div class="image-gallery">
+            {% for recommendation in recommendations %}
+                    <div class="image-item">
+                        <img src="/media/{{recommendation.w_id.image_name}}" alt="Recommended Outfit">
+                        <a href="{% url 'add_to_favorites' recommendation.c_id %}" class="add-fav-button" style="display: block;text-decoration: none;background-color:#5e0707; color: rgb(255, 255, 255); font-weight: bold;padding: 10px 15px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer; 
+                        width: fit-content;
+                        margin-left: 10% ;
+                        ">Add to Fav</a>
+                    </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No recommendations found for the selected occasion.</p>
+    {% endif %}
+    </section>
+    <footer class="footer">
+        <p>&copy; 2024 Closet. All rights reserved.</p>
+        <p>Follow us on <a href="#">Instagram</a>, <a href="#">Twitter</a>, and <a href="#">Facebook</a></p>
+    </footer>
+
+    <!-- <script>
+        document.getElementById('item-image').addEventListener('change', function() {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImage = document.createElement('img');
+                previewImage.src = e.target.result;
+                previewImage.style.maxWidth = '100%';
+                previewImage.style.marginTop = '20px';
+                const uploadSection = document.querySelector('.upload-section');
+                uploadSection.appendChild(previewImage);
+            };
+            reader.readAsDataURL(this.files[0]);
+        });
+    </script> -->
+    
+</body>
+</html>

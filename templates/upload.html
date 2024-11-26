@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Wardrobe - Closet</title>
+    <link rel="stylesheet" href="{% static 'css/upload.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+        }
+
+        .logo-img {
+            width: 80px; 
+            height: auto; 
+            border-radius: 50%;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#home"><img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Closet Logo" class="logo-img"></a>
+                <h1>Upload</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="{% url 'aboutus' %}">About</a></li>
+                <li><a href="{% url 'recommendation' %}">Recommend</a></li>
+                <li><a href="{% url 'view_wardrobe' %}">Your Wardrobe</a></li>
+                <li><a href="{% url 'favourite' %}">Favourites</a></li>
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="upload-section">
+        <h2>Upload Your Wardrobe</h2>
+        <p>Add your clothing items to the virtual wardrobe. Upload images, categorize them, and keep your wardrobe organized.</p>
+        
+        <form class="upload-form" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            <label for="item-image">Upload Image:</label>
+            <input type="file" id="item-image" name="item-image" accept="image/*" required>
+ 
+            <button type="submit" class="upload-button">Upload Item</button>
+            <div id="preview-container"></div>
+        </form>
+        
+
+        <form class="upload-form" enctype="multipart/form-data" method="POST">
+            {% csrf_token %}
+            <label for="folder-upload">Upload Folder:</label>
+            <input type="file" id="folder-upload" name="folder-upload" accept="image/*" webkitdirectory multiple>
+ 
+            <button type="submit" class="upload-button">Upload Folder Images</button>
+            <div id="preview-container-folder"></div>
+        </form>
+
+        
+        
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2024 Closet. All rights reserved.</p>
+        <p>Follow us on <a href="#">Instagram</a>, <a href="#">Twitter</a>, and <a href="#">Facebook</a></p>
+    </footer>
+
+    <script>
+        document.getElementById('folder-upload').addEventListener('change', function() {
+            const previewContainer = document.getElementById('preview-container-folder');
+            previewContainer.innerHTML = ''; // Clear previous previews
+
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewImage = document.createElement('img');
+                        previewImage.src = e.target.result;
+                        previewImage.className = 'preview-image';
+                        previewContainer.appendChild(previewImage);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        document.getElementById('item-image').addEventListener('change', function() {
+            const previewContainer = document.getElementById('preview-container');
+            previewContainer.innerHTML = ''; // Clear previous previews
+
+            Array.from(this.files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const previewImage = document.createElement('img');
+                        previewImage.src = e.target.result;
+                        previewImage.className = 'preview-image';
+                        previewContainer.appendChild(previewImage);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

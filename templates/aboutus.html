@@ -1,0 +1,70 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Closet</title>
+    <link rel="icon" href="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}">
+    <link rel="stylesheet" href="{% static 'css/aboutus.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Closet Logo" class="logo-img">
+                <h1>CLOSET</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'index' %}">Home</a></li>
+                <li><a href="#mission">Our Mission</a></li>
+                <li><a href="#team">Our Team</a></li>
+                <li><a href="#contactt">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero about-hero">
+        <div class="hero-content">
+            <h2>About Closet</h2>
+            <p>Discover more about who we are, our values, and what drives us to help you perfect your style every day.</p>
+        </div>
+    </section>
+
+    <section id="mission" class="mission">
+        <div class="container">
+            <h2>Our Mission</h2>
+            <p>At Closet, our mission is to empower individuals to express their unique style effortlessly. We believe that fashion is a form of self-expression, and everyone deserves to look and feel their best, every day.</p>
+        </div>
+    </section>
+
+    <section id="team" class="team">
+        <div class="container">
+            <h2>Meet the Team</h2>
+            <div class="team-cards">
+                <div class="team-card">
+                    <img src="{% static 'images/CEO.jpg' %}" alt="Team Member 1">
+                    <h3>Yashi</h3>
+                    <p>Founder & CEO</p>
+                </div>
+                <div class="team-card" >
+                    <!-- <img src="team-member2.jpg" alt="Team Member 2"> -->
+                    <h3 style="margin-top: 50%;">Want to join us ?</h3>
+                    <p>Drop us your CV at <br>closet-hr@closet.com</p>
+                </div>
+                <!-- <div class="team-card">
+                    <img src="team-member3.jpg" alt="Team Member 3">
+                    <h3>Serena</h3>
+                    <p>Head of Design</p>
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <footer id="contactt" class="footer" >
+        <p>Contact Us: <a href="mailto:support@closetapp.com">support@closetapp.com</a></p>
+        <p>Follow us on <a href="#">Instagram</a>, <a href="#">Twitter</a>, and <a href="#">Facebook</a></p>
+    </footer>
+</body>
+</html>

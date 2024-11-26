@@ -1,0 +1,312 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personality Style Quiz</title>
+    <style>
+        /* Basic reset */
+        .header {
+            /* background-color: #fff; */
+            padding: 20px 0;
+            /* border-bottom: 1px solid #e6e6e6; */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-img {
+            width: 80px;
+            height: auto;
+            border-radius: 50%;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            margin: auto;
+            color: #333;
+        }
+
+        .navbar .logo h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: rgba(255, 251, 251, 0.666);
+            letter-spacing: 1px;
+        }
+
+        body, h1, h3, label {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Body and container styling */
+        body {
+            background: url(../static/images/aesthetic_heart.jpeg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #f7f7f7;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0 10%;
+        }
+
+        .container {
+            top:5%;
+            width: 100%;
+            max-width: 1200px;
+            height:78vh;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: #5e0707;
+            font-size: 2.8em;
+            font-weight: bold;
+            margin-bottom: 2%;
+            letter-spacing: 1px;
+
+        }
+
+        h3 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 25px;
+            font-weight: normal;
+        }
+
+        /* Style for the form and input elements */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Card Styling - Larger cards */
+        .card {
+            width: 100%;
+            max-width: 900px;
+            background-color: #fff;
+            border: 2px solid #5e0707;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        /* Show the active card */
+        .card.active {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+            z-index: 1;
+        }
+
+        /* Style for the radio buttons and labels */
+        input[type="radio"] {
+            display: none;
+        }
+
+        label {
+            display: block;
+            background-color: #f1f1f1;
+            color: #333;
+            font-size: 18px;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            text-align: left;
+        }
+
+        input[type="radio"]:checked + label {
+            background-color: #5e0707;
+            color: white;
+        }
+
+        /* Button styling */
+        button {
+            background-color: #5e0707;
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: none;
+        }
+
+        button:hover {
+            background-color: #2c0303;
+        }
+
+        /* Navigation buttons */
+        .swipe-nav {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .swipe-nav button {
+            background-color: transparent;
+            border: 2px solid #5e0707;
+            padding: 18px 30px;
+            font-size: 18px;
+            color: #5e0707;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .swipe-nav button:hover {
+            background-color: #5e0707;
+            color: white;
+        }
+
+        /* Styling the selected question */
+        .swipe-nav button[disabled] {
+            background-color: #e0e0e0;
+            color: #b0b0b0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/"><img
+                        src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}"
+                        alt="Closet Logo" class="logo-img"></a>
+                <h1>CLOSET</h1>
+            </div>
+
+        </nav>
+    </header>
+    <div class="container">
+        <h1>Personality Style Quiz</h1>
+        <form action="{% url 'result' %}" method="post" id="quizForm">
+            {% csrf_token %}
+            <div id="questionContainer">
+                <div class="card" id="q1">
+                    <h3>1. What is your go-to outfit for a casual day out?</h3>
+                    <input type="radio" name="q1" value="A" id="q1a"><label for="q1a">Jeans and a T-shirt</label>
+                    <input type="radio" name="q1" value="B" id="q1b"><label for="q1b">A summer dress</label>
+                    <input type="radio" name="q1" value="C" id="q1c"><label for="q1c">Sweater and leggings</label>
+                    <input type="radio" name="q1" value="D" id="q1d"><label for="q1d">Button-up shirt and chinos</label>
+                </div>
+
+                <div class="card" id="q2">
+                    <h3>2. How do you feel about wearing bright colors?</h3>
+                    <input type="radio" name="q2" value="A" id="q2a"><label for="q2a">I love them and wear them all the time.</label>
+                    <input type="radio" name="q2" value="B" id="q2b"><label for="q2b">I wear them occasionally, but not too often.</label>
+                    <input type="radio" name="q2" value="C" id="q2c"><label for="q2c">I prefer neutral colors.</label>
+                    <input type="radio" name="q2" value="D" id="q2d"><label for="q2d">I avoid them and prefer darker shades.</label>
+                </div>
+
+                <div class="card" id="q3">
+                    <h3>3. What’s your ideal footwear?</h3>
+                    <input type="radio" name="q3" value="A" id="q3a"><label for="q3a">Sneakers or casual shoes</label>
+                    <input type="radio" name="q3" value="B" id="q3b"><label for="q3b">Boots or sandals</label>
+                    <input type="radio" name="q3" value="C" id="q3c"><label for="q3c">Ballet flats or slip-ons</label>
+                    <input type="radio" name="q3" value="D" id="q3d"><label for="q3d">Dress shoes or heels</label>
+                </div>
+
+                <div class="card" id="q4">
+                    <h3>4. How would you describe your style for an evening event?</h3>
+                    <input type="radio" name="q4" value="A" id="q4a"><label for="q4a">Relaxed, maybe a casual blazer or a cool shirt</label>
+                    <input type="radio" name="q4" value="B" id="q4b"><label for="q4b">Elegant, a formal dress or suit</label>
+                    <input type="radio" name="q4" value="C" id="q4c"><label for="q4c">Comfortable, like a maxi dress or something breezy</label>
+                    <input type="radio" name="q4" value="D" id="q4d"><label for="q4d">Sleek, a stylish top and tailored pants</label>
+                </div>
+
+                <div class="card" id="q5">
+                    <h3>5. How do you approach accessorizing?</h3>
+                    <input type="radio" name="q5" value="A" id="q5a"><label for="q5a">Simple and minimal</label>
+                    <input type="radio" name="q5" value="B" id="q5b"><label for="q5b">Bold and colorful</label>
+                    <input type="radio" name="q5" value="C" id="q5c"><label for="q5c">No accessories for me</label>
+                    <input type="radio" name="q5" value="D" id="q5d"><label for="q5d">Chic and elegant</label>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="swipe-nav">
+                <button type="button" id="prevButton" onclick="navigateQuiz(-1)" disabled style="display: block;">Previous</button>
+                <button type="button" id="nextButton" onclick="navigateQuiz(1)">Next</button>
+                <button type="submit" id="submitButton">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentCardIndex = 0;
+        const cards = document.querySelectorAll('.card');
+        const nextButton = document.getElementById('nextButton');
+        const prevButton = document.getElementById('prevButton');
+        const submitButton = document.getElementById('submitButton');
+
+        function navigateQuiz(direction) {
+            cards[currentCardIndex].classList.remove('active');
+            currentCardIndex += direction;
+
+            if (currentCardIndex < 0) currentCardIndex = 0;
+            if (currentCardIndex >= cards.length) currentCardIndex = cards.length - 1;
+
+            cards[currentCardIndex].classList.add('active');
+            updateButtonVisibility();
+        }
+
+        function updateButtonVisibility() {
+            if (currentCardIndex === 0) {
+                prevButton.disabled = true;
+            } else {
+                prevButton.disabled = false;
+            }
+
+            if (currentCardIndex === cards.length - 1) {
+                nextButton.style.display = 'none';
+                submitButton.style.display = 'inline-block';
+            } else {
+                nextButton.style.display = 'inline-block';
+                submitButton.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cards[currentCardIndex].classList.add('active');
+            updateButtonVisibility();
+        });
+    </script>
+</body>
+</html>

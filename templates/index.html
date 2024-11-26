@@ -1,0 +1,288 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closet - Your Personal Style Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        .testimonials {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1450px;
+            margin: auto;
+        }
+
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .testimonial-cards {
+            display: flex;
+        }
+
+        .testimonial {
+            min-width: 100%;
+            /* Full width for each testimonial */
+            box-sizing: border-box;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .prev,
+        .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            padding: 10px;
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
+        }
+
+        .social-media {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .social-media h3 {
+            font-size: 1.8em;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .social-media a {
+            margin: 0 20px;
+            font-size: 40px;
+            /* Adjust icon size */
+            color: #000000;
+            /* Default icon color */
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-media a:hover {
+            color: #ffffff;
+            /* Color change on hover */
+            transform: scale(1.1);
+            /* Slightly enlarge the icon on hover */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-page">
+        <div class="door left-door"></div>
+        <div class="door right-door"></div>
+    </div>
+    <div class="content">
+        <header class="header">
+            <nav class="navbar">
+                <div class="logo">
+                    <a href="#home"><img
+                            src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}"
+                            alt="Closet Logo" class="logo-img"></a>
+                    <h1>CLOSET</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="{% url 'aboutus' %}">About</a></li>
+                    <li><a href="#features">Features</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'profile' %}">Profile</a></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger"
+                                style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Your Wardrobe, Perfected</h2>
+                <p>Discover the perfect outfit every day, curated just for you by Closet.</p>
+                {% if user.is_authenticated %}
+                <a href="#how-it-works" class="cta-button">Get Started</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="cta-button">Get Started</a>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- <section id="about" class="about">
+            <h2>About Closet</h2>
+            <p>Closet is your personal style assistant, offering chic outfit recommendations based on your wardrobe,
+                preferences, and the occasion. Elevate your fashion game with a touch of elegance and sophistication.
+            </p>
+        </section> -->
+
+        <section id="features" class="features">
+            <h2>Features</h2>
+            <div class="feature-cards">
+                <div class="card">
+                    <h3>Upload Your Wardrobe</h3>
+                    <p>Digitize and organize your clothing items effortlessly.</p>
+                </div>
+                <div class="card">
+                    <h3>Personalized Outfit Ideas</h3>
+                    <p>Get stylish outfit recommendations tailored to your unique style.</p>
+                </div>
+                <div class="card">
+                    <h3>Style Insights</h3>
+                    <p>Analyze your fashion trends and discover new style inspirations.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- <section id="download" class="download">
+        <h2>Download the App</h2>
+        <p>Available soon on the App Store and Google Play.</p>
+        <div class="store-buttons">
+            <a href="#"><img src="appstore.png" alt="App Store"></a>
+            <a href="#"><img src="playstore.png" alt="Google Play"></a>
+        </div>
+    </section> -->
+
+        <section id="how-it-works" class="how-it-works">
+            <h2>How It Works</h2>
+            <div style="display: flex; justify-content: space-around;">
+                <div class="step"
+                    style="width: 30%; height: auto; background-color: #990707; border: solid 5px #785c56; padding: 1%;">
+                    <h3 class="heading_step" style="color: white;">Step 1: Upload Your Wardrobe</h3>
+                    <p class="discription_step" style="color: white;">Take photos of your clothing items or upload
+                        existing images from your gallery.</p>
+                </div>
+                <div class="step"
+                    style="width: 30%; height: auto; background-color: #5e0707; border: solid 5px #785c56; padding: 1%;">
+                    <h3 class="heading_step" style="color: white;">Step 2: Get Outfit Recommendations</h3>
+                    <p class="discription_step" style="color: white;">Let Closet curate stylish looks based on your
+                        wardrobe, occasion, and preferences.</p>
+                </div>
+                <div class="step"
+                    style="width: 30%; height: auto; background-color: #990707; border: solid 5px #785c56; padding: 1%;">
+                    <h3 class="heading_step" style="color: white;">Step 3: Track Your Style Trends</h3>
+                    <p class="discription_step" style="color: white;">Review your wardrobe analytics and get insights to
+                        enhance your style.</p>
+                </div>
+            </div>
+        </section>
+
+
+
+        <section id="testimonials" class="testimonials">
+            <h2 style="margin-top: -1%;">What Our Users Say</h2>
+            <div class="carousel">
+                <div class="testimonial-cards">
+                    <div class="testimonial">
+                        <p>"Closet completely transformed how I dress every day! It’s like having my own personal
+                            stylist."</p>
+                        <span>- Sarah, Fashion Enthusiast</span>
+                    </div>
+                    <div class="testimonial">
+                        <p>"I love the recommendations! It’s so easy to find the perfect outfit for any occasion."</p>
+                        <span>- John, Business Professional</span>
+                    </div>
+                    <div class="testimonial">
+                        <p>"Closet helped me organize my wardrobe and made me realize I have more outfit options than I
+                            thought!"</p>
+                        <span>- Emma, College Student</span>
+                    </div>
+                </div>
+            </div>
+            <button class="prev" onclick="moveSlide(-1)">&#10094;</button>
+            <button class="next" onclick="moveSlide(1)">&#10095;</button>
+        </section>
+
+        <section id="external-links" class="external-links"
+            style="background-color: #f7f7f7;height:30vh; padding: 20px; margin-top: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-family: 'Playfair Display', serif; color: #333; font-size: 1.8em; margin-bottom: 5vh;">Some
+                Useful Links</h2>
+            <a href="https://colorwise.me/self-analysis" target="_blank"
+                style="display: inline-block; font-family:'Montserrat', sans-serif; font-weight: 600; color: #3a3a3a; text-decoration: none; padding: 10px 15px; border: 2px solid transparent; margin: 10px 10px; border-radius: 5px; transition: all 0.3s ease; background-color: #fff;"
+                onmouseover="this.style.color='#fff'; this.style.backgroundColor='#5e0707'; this.style.borderColor='#5e0707'; this.style.transform='translateY(-3px)';"
+                onmouseout="this.style.color='#3a3a3a'; this.style.backgroundColor='#fff'; this.style.borderColor='transparent'; this.style.transform='translateY(0)';">Get
+                your own color palette</a>
+            <a href="{% url 'quiz' %}" target="_blank"
+                style="display: inline-block; font-family: 'Montserrat', sans-serif; font-weight: 600; color: #3a3a3a; text-decoration: none; padding: 10px 15px; border: 2px solid transparent; margin: 10px 10px; border-radius: 5px; transition: all 0.3s ease; background-color: #fff;"
+                onmouseover="this.style.color='#fff'; this.style.backgroundColor='#5e0707'; this.style.borderColor='#5e0707'; this.style.transform='translateY(-3px)';"
+                onmouseout="this.style.color='#3a3a3a'; this.style.backgroundColor='#fff'; this.style.borderColor='transparent'; this.style.transform='translateY(0)';">Take
+                your Style Quiz</a>
+        </section>
+
+
+        <footer id="contact" class="footer">
+            <div class="contact-info">
+                <h3>Contact Us</h3>
+                <p>Email: <a href="mailto:support@closetapp.com">support@closetapp.com</a></p>
+                <p>Phone: +1 234 567 890</p>
+            </div>
+            <div class="social-media">
+                <h3>Follow Us</h3>
+                <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+            </div>
+            <!-- <div class="newsletter">
+                <h3>Subscribe to Our Newsletter</h3>
+                <form>
+                    <input type="email" placeholder="Your Email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div> -->
+        </footer>
+
+
+
+    </div>
+    <script src="{% static 'script.js'%}"></script>
+</body>
+<script>
+    let currentSlide = 0;
+
+    function moveSlide(direction) {
+        const slides = document.querySelectorAll('.testimonial');
+        const totalSlides = slides.length;
+
+        // Update currentSlide index
+        currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+
+        // Move carousel
+        const carousel = document.querySelector('.carousel');
+        carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+
+    // Optional: Auto-slide every few seconds
+    setInterval(() => {
+        moveSlide(1);
+    }, 5000); // Change slide every 5 seconds
+
+</script>
+
+</html>
