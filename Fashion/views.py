@@ -16,7 +16,26 @@ from .models import Question, UserAnswer
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+from django.shortcuts import render
 
+def map_view(request):
+    # Sample data (replace with database queries)
+    restaurants = [
+        {"name": "Restaurant A", "latitude": 12.9716, "longitude": 77.5946},
+        {"name": "Event B", "latitude": 12.9756, "longitude": 77.5999},
+    ]
+
+    ngos = [
+        {"name": "NGO 1", "latitude": 12.9656, "longitude": 77.5946, "food_status": "red"},
+        {"name": "NGO 2", "latitude": 12.9616, "longitude": 77.5999, "food_status": "yellow"},
+        {"name": "NGO 3", "latitude": 12.9516, "longitude": 77.5899, "food_status": "green"},
+    ]
+
+    context = {
+        "restaurants": restaurants,
+        "ngos": ngos,
+    }
+    return render(request, "get_organizations.html",context)
 
 def index(request):
     return render(request, 'index.html')

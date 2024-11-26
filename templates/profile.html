@@ -48,7 +48,7 @@
             <ul class="nav-links">
                 <li><a href="{% url 'index' %}">Home</a></li>
                 <li><a href="#contactt">Contact</a></li>
-                <li><a href="{% url 'recommendation' %}">Donate</a></li>
+                <li><a href="{% url 'get_organizations' %}">Donate</a></li>
                 <li>
                     <form action="{% url 'logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}
@@ -92,7 +92,7 @@
             <div class="card">
                 <h3>Get Organizations</h3>
                 <p></p>
-                <a href="{% url 'recommendation' %}" class="cta-button">get</a>
+                <a href="{% url 'get_organizations' %}" class="cta-button">get</a>
             </div>
             <div class="card">
                 <h3> Insights</h3>

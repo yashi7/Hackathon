@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Fashion.views import index,login_view,signup,aboutus,upload,profile,recommendation,view_wardrobe,insights,favourite,add_to_favorites, remove_outfit, remove_from_wardrobe,quiz,result
+from Fashion.views import index,login_view,signup,aboutus,upload,profile,recommendation,view_wardrobe,insights,favourite,add_to_favorites, remove_outfit, remove_from_wardrobe,quiz,result,map_view
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
+from django.urls import path
+
+
+
 
 urlpatterns = [
+    path('get_organizations/', map_view, name='get_organizations'),
     path('admin/', admin.site.urls),
     path('',index,name='index'),
     path('index/',index,name='index'),
@@ -31,7 +36,7 @@ urlpatterns = [
     path('upload/',upload,name='upload'),
     
     path('profile/',profile,name='profile'),
-    path('recommendation/',recommendation,name='recommendation'),
+    # path('recommendation/',recommendation,name='recommendation'),
     path('view_wardrobe/', view_wardrobe, name='view_wardrobe'),
     path('insights/', insights, name='insights'),
     path('favourite/', favourite, name='favourite'), 

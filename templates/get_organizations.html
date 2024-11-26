@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Donation Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js "></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            height: 90vh;
+            width: 85vw;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend div:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .red { background: red; }
+        .yellow { background: yellow; }
+        .green { background: green; }
+        .blue { background: blue; }
+    </style>
+</head>
+<body>
+    <div class="maps" style="display:flex; justify-content: right;">
+        <div id="map"></div>
+    </div>
+    <div class="legend" style="z-index: 99;">
+        <h4>Legend</h4>
+        <div><span class="red"></span>Urgent Need (NGO)</div>
+        <div><span class="yellow"></span>Moderate Need (NGO)</div>
+        <div><span class="green"></span>No Need (NGO)</div>
+        <div><span class="blue"></span>Restaurant/Event</div>
+    </div>
+    
+    <script>
+        // Dynamic data passed from Django
+        const data = {
+            restaurants: {{ restaurants|safe }},
+            ngos: {{ ngos|safe }}
+        };
+
+        // Initialize the map
+        const map = L.map('map').setView([12.9716, 77.5946], 13); // Center on Bangalore
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add restaurant markers
+        data.restaurants.forEach((restaurant) => {
+            L.marker([restaurant.latitude, restaurant.longitude], {
+                icon: L.icon({
+                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/252/252025.png', // Custom blue icon
+                    iconSize: [30, 30], // Size of the icon
+                })
+            }).addTo(map)
+            .bindPopup(<h5>${restaurant.name}</h5><p>Restaurant/Event</p>);
+        });
+
+        // Add NGO markers with color-coded status
+        data.ngos.forEach((ngo) => {
+            const iconColor =
+                ngo.food_status === "red" ? "red" :
+                ngo.food_status === "yellow" ? "yellow" : "green";
+
+            L.circleMarker([ngo.latitude, ngo.longitude], {
+                color: iconColor,
+                radius: 10,
+                fillColor: iconColor,
+                fillOpacity: 0.8
+            }).addTo(map)
+            .bindPopup(<h5>${ngo.name}</h5><p>Food Status: ${ngo.food_status.toUpperCase()}</p>);
+        });
+    </script>
+</body>
+</html>
