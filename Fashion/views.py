@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from .models import new_user, Category, Wardrobe
-from static.Model.Model_interface import predict
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout

@@ -3,7 +3,7 @@ body {
     padding: 0;
     font-family: 'Montserrat', sans-serif;
     color: #333;
-    background-color: #5e0707;
+    background-color: #052777;
     line-height: 1.6;
 }
 
@@ -62,7 +62,7 @@ body {
 }
 
 .nav-links a:hover {
-    color: #5e0707;
+    color: #052777;
 }
 
 .about-hero {
@@ -156,7 +156,7 @@ body {
 
 .team-card:hover {
     transform: translateY(-10px);
-    background-color: #5e0707;
+    background-color: #052777;
     
 }
 .team-card img {

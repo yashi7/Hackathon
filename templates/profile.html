@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Closet</title>
-    <link rel="icon" href="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}">
+    <link rel="icon" href="">
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -40,15 +40,15 @@
     <header class="header">
         <nav class="navbar">
             <div class="logo">
-                <img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}" alt="Closet Logo" class="logo-img">
+                <img src="" alt="Closet Logo" class="logo-img">
                 <h1></h1>
                 <button  style="border: 2px solid black; border-radius: 50%; cursor: pointer; aspect-ratio: 1 / 1; font: bold;background-color: #5e0707; color: white;"onclick="onBgColorSelectorClick()" id="change_bg_color"> {{user.username}}</script></button>
-                <h1>CLOSET</h1>
+                <h1>FOODER</h1>
             </div>
             <ul class="nav-links">
                 <li><a href="{% url 'index' %}">Home</a></li>
                 <li><a href="#contactt">Contact</a></li>
-                <li><a href="{% url 'recommendation' %}">Recommend</a></li>
+                <li><a href="{% url 'recommendation' %}">Donate</a></li>
                 <li>
                     <form action="{% url 'logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}
@@ -85,37 +85,37 @@
         <h2>Your Dashboard</h2>
         <div class="feature-cards">
             <div class="card">
-                <h3>Upload Your Wardrobe</h3>
-                <p>Digitize and organize your clothing items effortlessly.</p>
+                <h3>Upload Details</h3>
+                <p></p>
                 <a href="{% url 'upload' %}" class="cta-button">Upload</a>
             </div>
             <div class="card">
-                <h3>Get Recommendations</h3>
-                <p>Receive personalized outfit ideas based on your wardrobe.</p>
-                <a href="{% url 'recommendation' %}" class="cta-button">Recommend</a>
+                <h3>Get Organizations</h3>
+                <p></p>
+                <a href="{% url 'recommendation' %}" class="cta-button">get</a>
             </div>
             <div class="card">
-                <h3>Wardrobe Insights</h3>
-                <p>Analyze your clothing trends and style preferences.</p>
+                <h3> Insights</h3>
+                <p></p>
                 <br>
                 <a href="{% url 'insights' %}" class="cta-button">Insights</a>
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <h3>Favorite Outfits</h3>
                 <p>Save and manage your favorite outfits.</p>
                 <br>
                 <a href="{% url 'favourite' %}" class="cta-button">Favourite</a>
-            </div>
+            </div> -->
             <div class="card">
-                <h3>View uploaded items</h3>
-                <p>Manage your profile, privacy settings, and more.</p>
-                <a href="{% url 'view_wardrobe' %}" class="cta-button">View Wardrobe</a>
+                <h3>View donations</h3>
+                <p></p>
+                <a href="{% url 'view_wardrobe' %}" class="cta-button">View </a>
             </div>
         </div>
     </section>
 
     <footer class="footer">
-        <p>Contact Us: <a href="mailto:support@closetapp.com">support@closetapp.com</a></p>
+        <p>Contact Us: <a href="mailto:support@ourapp.com">support@ourapp.com</a></p>
         <p>Follow us on <a href="#">Instagram</a>, <a href="#">Twitter</a>, and <a href="#">Facebook</a></p>
     </footer>
 

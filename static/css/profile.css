@@ -3,8 +3,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Montserrat', sans-serif;
-    background-color: #5e0707   ;
-    color: #5e0707;
+    background-color: #052777   ;
+    color: #052777;
 }
 
 h1, h2, h3, p {
@@ -72,7 +72,7 @@ ul {
 }
 
 .nav-links a:hover {
-    color: #5e0707;
+    color: #052777;
 }
 
 /* Hero Section */
@@ -165,7 +165,7 @@ ul {
 .cta-button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #5e0707;
+    background-color: #052777;
     color: #fff;
     border-radius: 30px;
     font-weight: bold;
@@ -179,7 +179,7 @@ ul {
 
 /* Footer */
 .footer {
-    background-color: #5e0707;
+    background-color: #052777;
     color: #f0f0f0;
     padding: 20px;
     text-align: center;

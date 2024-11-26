@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}">
-    <title>Sign Up - Closet</title>
+    <link rel="icon" href="">
+    <title>Sign Up - Fooder</title>
     <link rel="stylesheet" href="{% static 'css/signup.css' %}">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;600&display=swap"
@@ -17,9 +17,9 @@
     <header class="header">
         <nav class="navbar">
             <div class="logo">
-                <img src="{% static 'images/Leonardo_Phoenix_a_stylized_rounded_and_modern_logo_for_a_fash_3.jpg' %}"
+                <img src=""
                     alt="Closet Logo" class="logo-img">
-                <h1>CLOSET</h1>
+                <h1>FOODER</h1>
             </div>
         </nav>
     </header>
@@ -30,17 +30,17 @@
             <form action="#" method="post">
                 {% csrf_token %}
                 <div class="input-group">
-                    <label for="name">Full Name</label>
+                    <label for="name">Donor/Reciever</label>
                     <input type="text" id="UserName" name="UserName" required>
                 </div>
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
                 </div>
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                <label for="type">Type</label>
+                <select id="type" name="type" required>
+                    <option value="Reciever">Reciever</option>
+                    <option value="Donor">Donor</option>
                     
                 </select>
                 <div class="input-group">
