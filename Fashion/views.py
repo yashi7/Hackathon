@@ -1,77 +1,100 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from django.db import models
-from django.shortcuts import render
-
 from django.db.models import Count
 from django.utils import timezone
 from django.shortcuts import render, redirect
-
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from django.shortcuts import render
-import pandas as pd
-from django.shortcuts import render
 from django.http import JsonResponse
 import joblib
 import pandas as pd
-
 from django.shortcuts import render
-from .models import Restaurant, Event
+from .models import Restaurant, Event,new_user,DonationRequest
 import joblib
-import pandas as pd
 
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Restaurant
+
+@login_required
 def upload(request):
     if request.method == 'POST':
-        category = request.POST.get('category')
-        print(category)
-        if category == 'event':
-            # Extract and save Event data
-            event = Event.objects.create(
-                type_of_food=request.POST.get('type_of_food'),
-                number_of_guests=int(request.POST.get('number_of_guests')),
-                event_type=request.POST.get('event_type'),
-                quantity_of_food=float(request.POST.get('quantity_of_food')),
-                storage_conditions=request.POST.get('storage_conditions'),
-                purchase_history=request.POST.get('purchase_history'),
-                seasonality=request.POST.get('seasonality'),
-                preparation_method=request.POST.get('preparation_method'),
-                geographical_location=request.POST.get('geographical_location'),
-                pricing=request.POST.get('pricing'),
-            )
-            event.save()
+        # Get all POST data
+            form_data = request.POST.dict()  # Converts QueryDict to a standard dictionary
 
-            # Load the model and predict
-            event_model = joblib.load('event_model.pkl')
-            # Preprocess and predict (similar to earlier code)
+            # Print each key-value pair (for debugging purposes)
+            print("Form Data:")
+            for key, value in form_data.items():
+                print(f"{key}: {value}")
+            
+            # Extract data with default values for missing fields
+            category = request.POST.get("category", "Not Provided")
+            location = request.POST.get("location", "Not Provided")
+            locality = request.POST.get("locality", "Not Provided")
+            city = request.POST.get("city", "Not Provided")
+            cuisine = request.POST.get("cuisine", "Not Provided")
+            
+            # Restaurant-specific fields
+            rating = request.POST.get("rating", None)  # Could be None or not provided
+            votes = request.POST.get("votes", None)
+            cost = request.POST.get("cost", None)
 
-        elif category == 'restaurant':
-            # Extract and save Restaurant data
-            restaurant = Restaurant.objects.create(
-                location=request.POST.get('location'),
-                locality=request.POST.get('locality'),
-                city=request.POST.get('city'),
-                cuisine=request.POST.get('cuisine'),
-                rating=float(request.POST.get('rating')),
-                votes=int(request.POST.get('votes')),
-                cost=float(request.POST.get('cost')),
-            )
-            restaurant.save()
+            # Event-specific fields (can be handled in another model or part of your form)
+            type_of_food = request.POST.get("type_of_food", "Not Provided")
+            number_of_guests = request.POST.get("number_of_guests", "Not Provided")
+            event_type = request.POST.get("event_type", "Not Provided")
+            quantity_of_food = request.POST.get("quantity_of_food", "Not Provided")
+            storage_conditions = request.POST.get("storage_conditions", "Not Provided")
+            purchase_history = request.POST.get("purchase_history", "Not Provided")
+            seasonality = request.POST.get("seasonality", "Not Provided")
+            preparation_method = request.POST.get("preparation_method", "Not Provided")
+            geographical_location = request.POST.get("geographical_location", "Not Provided")
+            pricing = request.POST.get("pricing", "Not Provided")
 
-            # Load the model and predict
-            restaurant_model = joblib.load('restaurant_model.pkl')
-            # Preprocess and predict (similar to earlier code)
+        # Save the restaurant details to the Restaurant model (or another model if needed)
+            if rating and votes and cost:  # Ensure that the restaurant-specific data is valid
+                restaurant = Restaurant(
+                    location=location,
+                    locality=locality,
+                    city=city,
+                    cuisine=cuisine,
+                    rating=float(rating),  # Make sure rating is a float
+                    votes=int(votes),  # Make sure votes is an integer
+                    cost=float(cost)  # Make sure cost is a float
+                )
+                restaurant.save()
 
-        # Render the result
-        return render(request, 'upload.html', {'prediction': prediction[0]})
+            else:
+                event = Event(
+                    type_of_food=type_of_food,
+                    number_of_guests=number_of_guests,
+                    event_type=event_type,
+                    quantity_of_food=quantity_of_food,
+                    storage_conditions=storage_conditions,
+                    purchase_history=purchase_history,
+                    seasonality=seasonality,
+                    preparation_method=preparation_method,
+                    geographical_location=geographical_location,
+                    pricing=pricing,
+                )
+                event.save()
+
+            # Redirect to a confirmation page or back to the upload form
+            return redirect('upload')  # Or another view for confirmation
+        
+    else:
+            # Handle case where the restaurant data is not complete (invalid data)
+            return render(request, 'upload.html', {'error': 'Please fill out all required fields.'})
 
     return render(request, 'upload.html')
+
+
 
 
 def insights(request):
@@ -85,14 +108,6 @@ def insights(request):
     }
     return render(request, 'insights.html', insights_data)
 
-def view_donations(request):
-    # Example donation data
-    donations = [
-        {"donor": "Restaurant A", "recipient": "NGO 1", "quantity": "50 meals", "date": "2024-11-20"},
-        {"donor": "Restaurant B", "recipient": "NGO 2", "quantity": "30 meals", "date": "2024-11-22"},
-        {"donor": "Event C", "recipient": "NGO 3", "quantity": "100 meals", "date": "2024-11-25"},
-    ]
-    return render(request, 'view_donations.html', {"donations": donations})
 
 def map_view(request):
     # Sample data (replace with database queries)
@@ -135,24 +150,26 @@ def login_view(request):
 def signup(request):
     if request.method == 'POST':
         username = request.POST.get('UserName')
-        email = request.POST.get('email')
-        gender = request.POST.get('gender')
+        email = request.POST.get('email') 
+        type = request.POST.get('type') 
         password = request.POST.get('password')
-        con_pass = request.POST.get('confirm_password')
+        confirm_password = request.POST.get('confirm_password')
 
-        if password != con_pass:
-            return redirect('signup')
-
-        my_user = User.objects.create_user(username, email, password)
-        my_user.save()
-
-        user = new_user(username=username,
-                      email=email,
-                      Gender=gender,
-                      )
+        if password != confirm_password:
+            return render(request, 'signup.html', {'error': 'Passwords do not match'})
+        
+        user = User.objects.create_user(username=username, email=email, password=password)
         user.save()
+
+        new_user_instance = new_user(username=username, email=email, Type=type)
+        new_user_instance.save()
         return redirect('login')
+
     return render(request, 'signup.html')
+
+
+def profile(request):
+    return render(request, 'profile.html')
 
 
 def aboutus(request):
@@ -192,165 +209,6 @@ def aboutus(request):
 #         else:
 #             return render(request, 'upload.html', {'error': 'All fields are required'})
 #     return render(request,'upload.html')
-@login_required
-def upload(request):
-    print(f"Logged in user: {request.user.username}")
-    if request.method == 'POST':
-        image = request.FILES.get('item-image')
-        folder = request.FILES.getlist('folder-upload')
-        print(image)
-        print(folder)
-        try:
-                user_instance = new_user.objects.get(
-                    username=request.user.username)
-        except new_user.DoesNotExist:
-                print(
-                    f"No new_user instance found for username: {request.user.username}")
-                return render(request, 'upload.html', {'error': 'User information not found. Please sign up again.'})
-
-        fs = FileSystemStorage()
-
-        if image:
-            # Attempt to fetch the user's new_user instance safely
-            
-            filename = fs.save(image.name, image)  # Save image to media folder
-            print(filename)
-            image_url = fs.url(filename)
-            print("IN UPLOAD*******@@@@@@", image_url)
-            # Create and save the Wardrobe instance
-            my_wardrobe = Wardrobe(
-                u_id=user_instance, img_path=image_url, image_name=image.name)
-            print("my wardrobe is", my_wardrobe)
-            my_wardrobe.save()
-
-            # Use the predict function to get the category, color, and occasion
-            category, color, occasion = predict(image)
-
-            # Create and save the Category instance
-            my_category = Category(w_id=my_wardrobe, u_id=user_instance,
-                                   Category=category, Color=color, Occassion=occasion)
-            my_category.save()
-
-            print(category, color, occasion)
-            return redirect('upload')  # Adjust redirect based on your URLs
-        elif folder:
-            for file in folder:
-                if file.content_type.startswith('image/'):  # Check if the file is an image
-                    filename = fs.save(file.name, file)  # Save each image to media folder
-                    image_url = fs.url(filename)
-                    print("Folder image URL:", image_url)
-
-                    # Create and save the Wardrobe instance for each image
-                    my_wardrobe = Wardrobe(u_id=user_instance, img_path=image_url, image_name=file.name)
-                    my_wardrobe.save()
-
-                    # Use the predict function for each image file
-                    category, color, occasion = predict(file)
-
-                    # Create and save the Category instance for each image
-                    my_category = Category(w_id=my_wardrobe, u_id=user_instance, Category=category, Color=color, Occassion=occasion)
-                    my_category.save()
-
-                    print("Folder image details:", category, color, occasion)
-
-            return redirect('upload')
-        else:
-            return render(request, 'upload.html', {'error': 'All fields are required'})
-
-    return render(request, 'upload.html')
-
-
-
-def profile(request):
-    return render(request, 'profile.html')
-
-COLOR_COMPATIBILITY = {
-    'Black': ['White', 'Red', 'Grey', 'Pink', 'Magenta', 'Orange', 'Yellow'],
-    'Blue': ['White', 'Grey', 'Pink', 'Yellow'],
-    'Brown': ['Beige', 'White', 'Green', 'Yellow', 'Orange'],
-    'Green': ['White', 'Black', 'Brown', 'Yellow'],
-    'Grey': ['Black', 'White', 'Pink', 'Blue'],
-    'Magenta': ['White', 'Black', 'Grey'],
-    'Navy Blue': ['White', 'Yellow', 'Grey', 'Pink'],
-    'Orange': ['White', 'Black', 'Brown', 'Yellow'],
-    'Pink': ['White', 'Grey', 'Black'],
-    'Red': ['White', 'Black', 'Grey', 'Magenta'],
-    'White': ['Black', 'Blue', 'Red', 'Yellow', 'Pink'],
-    'Yellow': ['Black', 'Blue', 'White', 'Orange'],
-}
-
-def recommendation(request):
-
-    if request.method == 'POST':
-        occassion_rec = request.POST.get('occassion')
-        user_instance = new_user.objects.get(username=request.user.username)
-        matching_items = Category.objects.filter(
-            Occassion=occassion_rec).filter(u_id=user_instance)
-            # Step 2: Initialize recommendation list
-        recommendations = []
-
-        # Step 3: Process items for recommendations
-        for item in matching_items:
-            if item.Category in ['Dress', 'Saree', 'Apparel Set']:
-                # Standalone items
-                recommendations.append(item)
-            if item.Category == 'Topwear':
-                # Find compatible Bottomwear
-                compatible_bottoms = matching_items.filter(
-                    Category='Bottomwear',
-                    Color=COLOR_COMPATIBILITY.get(item.Color, [])
-                )
-                print(compatible_bottoms)
-                for bottom in compatible_bottoms:
-                    recommendations.append((item, bottom))  # Pair top and bottom
-
-                if len(compatible_bottoms)==0:
-                    recommendations.append(item)
-            if item.Category == 'Bottomwear':
-                # Find compatible Topwear
-                compatible_tops = matching_items.filter(
-                    Category='Topwear',
-                    Color=COLOR_COMPATIBILITY.get(item.Color, [])
-                )
-                for top in compatible_tops:
-                    recommendations.append((top, item))  # Pair top and bottom
-                if len(compatible_tops)==0:
-                    recommendations.append(item)
-
-         # Step 4: Save recommendations to database
-        for recommendation in recommendations:
-            if isinstance(recommendation, tuple):  # If it's a pair (Topwear + Bottomwear)
-                top, bottom = recommendation
-                if not Rec.objects.filter(u_id=user_instance, c_id=top).exists():
-                    Rec.objects.create(u_id=user_instance, c_id=top, created_at=timezone.now())
-                if not Rec.objects.filter(u_id=user_instance, c_id=bottom).exists():
-                    Rec.objects.create(u_id=user_instance, c_id=bottom, created_at=timezone.now())
-            else:  # Standalone items
-                if not Rec.objects.filter(u_id=user_instance, c_id=recommendation).exists():
-                    Rec.objects.create(u_id=user_instance, c_id=recommendation, created_at=timezone.now())
-
-        # Render recommendations in the template
-        return render(request, 'recommendation.html', {'recommendations': recommendations,'occassion':occassion_rec})
-
-    return render(request, 'recommendation.html')
-
-
-@login_required
-def view_wardrobe(request):
-    try:
-        # Get the `new_user` instance of the currently logged-in user
-        user_instance = new_user.objects.get(username=request.user.username)
-
-        # Fetch all wardrobe items uploaded by this user
-        user_items = Wardrobe.objects.filter(u_id=user_instance)
-        user_categories = Category.objects.filter(u_id=user_instance)
-
-    except new_user.DoesNotExist:
-        user_items = []  # If the user is not found, show no items
-        user_categories = []
-
-    return render(request, 'view_wardrobe.html', {'items': user_items, 'categories': user_categories})
-
 
 # def insights(request):
 #     # Aggregate data: Count how many times each occasion appears in `rec`
@@ -407,35 +265,6 @@ def view_wardrobe(request):
     # return render(request, 'insights.html', context) 
 
 
-def favourite(request):
-    if request.user.is_authenticated:
-        user_instance = get_object_or_404(new_user, username=request.user.username)
-        favorites = Favourites.objects.filter(u_id=user_instance)
-
-        # Prepare a list to hold favorite images and related details
-        favorite_items = []
-        
-        for fav in favorites:
-            print("this is fav id",fav.c_id_id)
-            # Accessing the Category linked with the favorite
-            category = get_object_or_404(Category, c_id=fav.c_id_id)
-            # Get the corresponding Wardrobe item
-            wardrobe_item = get_object_or_404(Wardrobe, w_id=category.w_id_id)  # Get the wardrobe item associated with this category
-
-            # Append the wardrobe item details to favorite_items
-            favorite_items.append({
-                'f_id': fav.f_id,
-                'image_name': wardrobe_item.image_name,
-                'image_path': wardrobe_item.img_path.url,  # Assuming you want the URL for the image
-                'category': category.Category,
-                'color': category.Color,
-                'occasion': category.Occassion,
-            })
-        # favorite_items = Favourites.objects.filter(user=request.user).select_related('c_id')
-        return render(request, 'favourite.html', {'favorite_items': favorite_items})
-    else:
-        return redirect('login')
-
 
 
 # @outdated
@@ -476,80 +305,82 @@ def favourite(request):
 #     })
 
 
-def add_to_favorites(request, category_id):
-    # Ensure 'category_id' is valid
-    category = get_object_or_404(Category, c_id=category_id)
-
-    # Get the logged-in user instance
-    user = request.user  # Assuming 'request.user' is set to the logged-in user instance
-
-    # Retrieve the new_user instance associated with the logged-in user
-    user_instance = get_object_or_404(new_user, username=user.username)
-
-    # Create or get a favorite item entry
-    favorite, created = Favourites.objects.get_or_create(u_id=user_instance, c_id=category)
-
-    # Redirect or render a response after adding to favorites
-    return redirect('favourite')
-
-
-def remove_outfit(request, id):
-    if request.method == 'POST':
-        favorite_item = get_object_or_404(Favourites, f_id=id)
-        favorite_item.delete()  # Remove the favorite item
-        return redirect('favourite')
-    
-def remove_from_wardrobe(request,category_id):
-    if request.method == 'POST':
-        print("*********in remove wid************",category_id)
-        Category_item = get_object_or_404(Category, c_id=category_id)
-        print("*********in remove wid************",Category_item.w_id_id)
-        wardrobe_item = get_object_or_404(Wardrobe, w_id=Category_item.w_id_id)
-        wardrobe_item.delete()  # Remove the wardrobe_item item
-        return redirect('view_wardrobe')
-
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-# Define the quiz view
-def quiz(request):
-    return render(request, 'quiz.html')
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-# Define the result view
-def result(request):
+@csrf_exempt
+def send_donation_request(request):
     if request.method == 'POST':
-        # Collect answers from POST request
-        answers = {
-            'q1': request.POST.get('q1'),
-            'q2': request.POST.get('q2'),
-            'q3': request.POST.get('q3'),
-            'q4': request.POST.get('q4'),
-            'q5': request.POST.get('q5')
-        }
+        try:
+            data = json.loads(request.body)
+            ngo_name = data.get('ngoName')
+            food_needed = data.get('foodNeeded')
+            donor_name = data.get('donorName')
+            donor_contact = data.get('donorContact')
 
-        # Calculate the personality style based on answers
-        style_scores = {
-            'Casual': 0,
-            'Formal': 0,
-            'Bohemian': 0,
-            'Minimalist': 0
-        }
+            # Save the donation request (you should create a DonationRequest model)
+            donation_request = DonationRequest(
+                ngo_name=ngo_name,
+                food_needed=food_needed,
+                donor_name=donor_name,
+                donor_contact=donor_contact
+            )
+            donation_request.save()
 
-        # Assign scores based on answers
-        for answer in answers.values():
-            if answer == 'A':
-                style_scores['Casual'] += 1
-            elif answer == 'B':
-                style_scores['Bohemian'] += 1
-            elif answer == 'C':
-                style_scores['Minimalist'] += 1
-            elif answer == 'D':
-                style_scores['Formal'] += 1
+            return JsonResponse({"message": "Donation request sent successfully!"})
 
-        # Determine the highest scoring style
-        personality_type = max(style_scores, key=style_scores.get)
+        except Exception as e:
+            return JsonResponse({"message": f"Error: {str(e)}"}, status=400)
 
-        # Return the result to the result page
-        return render(request, 'result.html', {'personality_type': personality_type})
+    return JsonResponse({"message": "Invalid request"}, status=400)
+
+# views.py
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse
+from .models import Donation
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+def generate_invoice(request, donation_id):
+    print(donation_id,"............................")
+    try:
+        donation = get_object_or_404(Donation, id=donation_id)
+    except:
+        return render(request, 'generate_invoice.html')
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{donation_id}.pdf"'
+
+    # Generate PDF
+    p = canvas.Canvas(response, pagesize=letter)
     
-    return HttpResponse("No answers received.")
+    p.setFont("Helvetica", 12)
+    
+    # Add content to the PDF
+    p.drawString(100, 750, f"Tax Deduction Invoice for Donation #{donation.id}")
+    p.drawString(100, 730, f"Donor: {donation.donor}")
+    p.drawString(100, 710, f"Recipient: {donation.recipient}")
+    p.drawString(100, 690, f"Quantity Donated: {donation.quantity}")
+    p.drawString(100, 670, f"Date of Donation: {donation.date}")
+    
+    # Add any other details as needed
+    p.drawString(100, 650, f"Amount for Tax Deduction: {donation.amount_donated}")
+    
+    # Close the PDF document
+    p.showPage()
+    p.save()
+    # return response
+    return render(request, 'generate_invoice.html')
+# views.py
+from django.shortcuts import render
+from .models import Donation
+
+def view_donations(request):
+    donations = Donation.objects.filter(donor_name=request.user.username)  # Assuming you associate donations with the user
+    return render(request, 'view_donations.html', {'donations': donations})
+def profile(request):
+    return render(request, 'profile.html')

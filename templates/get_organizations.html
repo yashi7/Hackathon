@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Donation Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js "></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,6 +62,47 @@
         .blue {
             background: blue;
         }
+
+        .popup-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styling for the request form */
+        .request-form {
+            margin-top: 15px;
+        }
+
+        .request-form input {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .request-form button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .request-form button:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 
@@ -81,11 +122,12 @@
         // Dynamic data passed from Django
         const data = {
             restaurants: [{ "name": "Restaurant A", "latitude": 12.9716, "longitude": 77.5946 }],
-            ngos: [{ "name": "NGO 1", "latitude": 12.9656, "longitude": 77.5946, "food_status": "red" },
-            { "name": "NGO 2", "latitude": 11.9956, "longitude": 77.5046, "food_status": "yellow" },
-            { "name": "NGO 3", "latitude": 11.9656, "longitude": 77.5946, "food_status": "green" }]
+            ngos: [
+                { "name": "NGO 1", "latitude": 12.9656, "longitude": 77.5946, "food_status": "red", "food_needed": "50 kg of rice" },
+                { "name": "NGO 2", "latitude": 11.9956, "longitude": 77.5046, "food_status": "yellow", "food_needed": "30 kg of vegetables" },
+                { "name": "NGO 3", "latitude": 11.9656, "longitude": 77.5946, "food_status": "green", "food_needed": "10 kg of flour" }
+            ]
         };
-
 
         // Initialize the map
         const map = L.map('map').setView([12.9716, 77.5946], 13); // Center on Bangalore
@@ -104,7 +146,6 @@
                 })
             }).addTo(map)
             .bindPopup(`<h5>${restaurant.name}</h5><p>Restaurant/Event</p>`);
-        
         });
 
         // Add NGO markers with color-coded status
@@ -113,14 +154,57 @@
                 ngo.food_status === "red" ? "red" :
                     ngo.food_status === "yellow" ? "yellow" : "green";
 
-            L.circleMarker([ngo.latitude, ngo.longitude], {
+            const marker = L.circleMarker([ngo.latitude, ngo.longitude], {
                 color: iconColor,
                 radius: 10,
                 fillColor: iconColor,
                 fillOpacity: 0.8
-            }).addTo(map)
-            .bindPopup(`<h5>${ngo.name}</h5><p>Food Status: ${ngo.food_status.toUpperCase()}</p>`);
+            }).addTo(map);
+
+            marker.bindPopup(`
+                <h5>${ngo.name}</h5>
+                <p>Food Status: ${ngo.food_status.toUpperCase()}</p>
+                <p>Food Needed: ${ngo.food_needed}</p>
+                <div class="request-form">
+                    <input type="text" id="donorName-${ngo.name}" placeholder="Enter your name">
+                    <input type="text" id="donorContact-${ngo.name}" placeholder="Enter your contact details">
+                    <button onclick="sendDonationRequest('${ngo.name}', '${ngo.food_needed}')">Send Donation Request</button>
+                </div>
+            `);
         });
+
+        // Function to handle donation requests
+        function sendDonationRequest(ngoName, foodNeeded) {
+            const donorName = document.getElementById(`donorName-${ngoName}`).value;
+            const donorContact = document.getElementById(`donorContact-${ngoName}`).value;
+
+            if (donorName && donorContact) {
+                alert(`Donation request sent to ${ngoName} for ${foodNeeded}\nDonor: ${donorName}\nContact: ${donorContact}`);
+                // Send request to Django backend to save donation details
+                fetch('/send_donation_request/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}' // CSRF token for Django
+                    },
+                    body: JSON.stringify({
+                        ngoName: ngoName,
+                        foodNeeded: foodNeeded,
+                        donorName: donorName,
+                        donorContact: donorContact
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message); // Show success message from Django response
+                })
+                .catch(error => {
+                    alert("Error sending donation request!");
+                });
+            } else {
+                alert("Please fill out all fields.");
+            }
+        }
     </script>
 </body>
 

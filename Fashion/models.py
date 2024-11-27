@@ -74,3 +74,28 @@ class CurrentBalance(models.Model):
             return f"NGO: {self.ngo.name} (Requirement: {self.current_requirement} kg)"
         return "Balance Record"
 
+from django.db import models
+
+class DonationRequest(models.Model):
+    ngo_name = models.CharField(max_length=100)
+    food_needed = models.CharField(max_length=200)
+    donor_name = models.CharField(max_length=100)
+    donor_contact = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Donation to {self.ngo_name} by {self.donor_name}"
+# models.py
+from django.db import models
+
+class Donation(models.Model):
+    ngo_name = models.CharField(max_length=100)
+    food_needed = models.CharField(max_length=200)
+    donor_name = models.CharField(max_length=100)
+    donor_contact = models.CharField(max_length=100)
+    donation_amount = models.FloatField()  # You can calculate or manually input the donation amount
+    donation_date = models.DateTimeField(auto_now_add=True)
+    tax_deduction_invoice_generated = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Donation to {self.ngo_name} by {self.donor_name}"

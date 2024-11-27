@@ -107,7 +107,7 @@ body {
 }
 
 .hero {
-    /* background: url(images/bg.jpg) no-repeat center center/cover; */
+    background: url(images/1.jpg) no-repeat center center/cover;
     height: 80vh;
     display: flex;
     align-items: center;
@@ -225,7 +225,7 @@ body {
 }
 
 .card:hover h3 {
-    color: #fff; 
+    color: #ffffff; 
 }
 
 

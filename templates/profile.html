@@ -40,7 +40,7 @@
     <header class="header">
         <nav class="navbar">
             <div class="logo">
-                <img src="" alt="Closet Logo" class="logo-img">
+                <img src="{% static '\images/ecofriendly-waste-unique-logo-design-featuring-organic-natural-trash-elements_579306-40455.avif' %}" alt="Closet Logo" class="logo-img">
                 <h1></h1>
                 <button  style="border: 2px solid black; border-radius: 50%; cursor: pointer; aspect-ratio: 1 / 1; font: bold;background-color: #5e0707; color: white;"onclick="onBgColorSelectorClick()" id="change_bg_color"> {{user.username}}</script></button>
                 <h1>FOODER</h1>
@@ -52,9 +52,8 @@
                 <li>
                     <form action="{% url 'logout' %}" method="post" style="display:inline;">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;">Logout</button>
+                        <button type="submit" class="btn btn-danger" style="border:none; background-color: inherit; font: inherit; font-weight: bold;cursor: pointer;">Logout</button>
                     </form>
-                    x
                 </li>
             </ul>
         </nav>
@@ -94,23 +93,17 @@
                 <p></p>
                 <a href="{% url 'get_organizations' %}" class="cta-button">Get</a>
             </div>
-            <div class="card">
+            <!-- <div class="card">
                 <h3> Insights</h3>
                 <p></p>
                 <br>
                 <a href="{% url 'insights' %}" class="cta-button">Insights</a>
-            </div>
-            <!-- <div class="card">
-                <h3>Favorite Outfits</h3>
-                <p>Save and manage your favorite outfits.</p>
-                <br>
-                <a href="{% url 'favourite' %}" class="cta-button">Favourite</a>
-            </div> -->
+            </div> 
             <div class="card">
                 <h3>View donations</h3>
                 <p></p>
                 <a href="{% url 'view_donations' %}" class="cta-button">View </a>
-            </div>
+            </div> -->
         </div>
     </section>
 

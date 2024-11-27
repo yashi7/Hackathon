@@ -25,6 +25,17 @@
         table th {
             background-color: #f4f4f4;
         }
+        .generate-invoice-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .generate-invoice-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +48,7 @@
                     <th>Recipient</th>
                     <th>Quantity</th>
                     <th>Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,6 +58,9 @@
                     <td>{{ donation.recipient }}</td>
                     <td>{{ donation.quantity }}</td>
                     <td>{{ donation.date }}</td>
+                    <td>
+                        <a href="{% url 'generate_invoice' donation.id %}" class="generate-invoice-btn">Generate Invoice</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
