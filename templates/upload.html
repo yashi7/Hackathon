@@ -4,55 +4,213 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Details</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            background: #ffffff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-top: 100vh;
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: #343a40;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        input[type="text"], input[type="number"], input[type="radio"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            display: block;
+            box-sizing: border-box;
+        }
+
+        input[type="radio"] {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .category-selection label {
+            font-weight: normal;
+            margin-right: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        #restaurant-fields, #event-fields {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f1f1f1;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            visibility: hidden; /* Keeps the element in the layout but makes it invisible */
+            height: 0; /* Collapses the height to zero initially */
+            overflow: hidden; /* Prevents content overflow when hidden */
+            transition: height 0.3s ease; /* Smooth height transition */
+        }
+
+        #restaurant-fields.active, #event-fields.active {
+            visibility: visible; /* Makes the element visible */
+            height: auto; /* Restores the natural height */
+        }
+
+        .prediction {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #28a745;
+        }
+    </style>
     <script>
         function toggleFields() {
             const category = document.querySelector('input[name="category"]:checked').value;
-            document.getElementById('restaurant-fields').style.display = category === 'restaurant' ? 'block' : 'none';
-            document.getElementById('event-fields').style.display = category === 'event' ? 'block' : 'none';
+            const restaurantFields = document.getElementById('restaurant-fields');
+            const eventFields = document.getElementById('event-fields');
+            const section=document.getElementById('section_remove');
+            if (category === 'restaurant') {
+                restaurantFields.classList.add('active');
+                eventFields.classList.remove('active');
+                restaurantFields.style.visibility="visible";
+                restaurantFields.style.height="fit-content";
+                section.style.display = "block";
+            }
+             else {
+                restaurantFields.classList.remove('active');
+                eventFields.classList.add('active');
+                section.style.display = "none";
+            }
+
         }
     </script>
 </head>
 <body>
-    <h1>Upload Details</h1>
-    <form action="/upload/" method="POST">
-        {% csrf_token %}
-        <label>
-            <input type="radio" name="category" value="restaurant" onchange="toggleFields()" checked>
-            Restaurant
-        </label>
-        <label>
-            <input type="radio" name="category" value="event" onchange="toggleFields()">
-            Event
-        </label>
-        
-        <div>
-            <label>Location: <input type="text" name="location" required></label>
-            <label>Locality: <input type="text" name="locality" required></label>
-            <label>City: <input type="text" name="city" required></label>
-            <label>Cuisine: <input type="text" name="cuisine" required></label>
-        </div>
+    <div class="form-container">
+        <h1>Upload Details</h1>
+        <form action="/upload/" method="POST">
+            {% csrf_token %}
 
-        <!-- Restaurant-specific fields -->
-        <div id="restaurant-fields">
-            <h3>Restaurant Details</h3>
-            <label>Rating: <input type="number" step="0.1" name="rating"></label>
-            <label>Votes: <input type="number" name="votes"></label>
-            <label>Cost: <input type="number" name="cost"></label>
-        </div>
+            <!-- Category Selection -->
+            <div class="category-selection section">
+                <label>
+                    <input type="radio" name="category" value="restaurant" onchange="toggleFields()" checked>
+                    Restaurant
+                </label>
+                <label>
+                    <input type="radio" name="category" value="event" onchange="toggleFields()">
+                    Event
+                </label>
+            </div>
 
-        <!-- Event-specific fields -->
-        <div id="event-fields" style="display: none;">
-            <h3>Event Details</h3>
-            <label>Attendees: <input type="number" name="attendees"></label>
-            <label>Duration (hours): <input type="number" step="0.1" name="duration"></label>
-            <label>Food Wastage (kg): <input type="number" step="0.1" name="food_wastage"></label>
-        </div>
+            <!-- Common Fields -->
+            <div class="section" id="section_remove">
+                <label>Location:</label>
+                <input type="text" name="location" required>
 
-        <button type="submit">Submit</button>
-    </form>
+                <label>Locality:</label>
+                <input type="text" name="locality" required>
 
-    {% if prediction %}
-        <h2>Predicted Extra Food Amount: {{ prediction }}</h2>
-    {% endif %}
+                <label>City:</label>
+                <input type="text" name="city" required>
+
+                <label>Cuisine:</label>
+                <input type="text" name="cuisine" required>
+            </div>
+
+            <!-- Restaurant-specific Fields -->
+            <div id="restaurant-fields" class="section">
+                <h3>Restaurant Details</h3>
+                <label>Rating:</label>
+                <input type="number" step="0.1" name="rating">
+
+                <label>Votes:</label>
+                <input type="number" name="votes">
+
+                <label>Cost:</label>
+                <input type="number" name="cost">
+            </div>
+
+            <!-- Event-specific Fields -->
+            <div id="event-fields" class="section">
+                <h3>Event Details</h3>
+                <label>Type of Food:</label>
+                <input type="text" name="type_of_food">
+
+                <label>Number of Guests:</label>
+                <input type="number" name="number_of_guests">
+
+                <label>Event Type:</label>
+                <input type="text" name="event_type">
+
+                <label>Quantity of Food:</label>
+                <input type="number" step="0.1" name="quantity_of_food">
+
+                <label>Storage Conditions:</label>
+                <input type="text" name="storage_conditions">
+
+                <label>Purchase History:</label>
+                <input type="text" name="purchase_history">
+
+                <label>Seasonality:</label>
+                <input type="text" name="seasonality">
+
+                <label>Preparation Method:</label>
+                <input type="text" name="preparation_method">
+
+                <label>Geographical Location:</label>
+                <input type="text" name="geographical_location">
+
+                <label>Pricing:</label>
+                <input type="text" name="pricing">
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        {% if prediction %}
+            <div class="prediction">
+                <h2>Predicted Value: {{ prediction }}</h2>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

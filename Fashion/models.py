@@ -1,82 +1,76 @@
 from django.db import models
 import uuid
 from django.utils import timezone
-Type=(
-    ("Apparel","Apparel"),
-    ("Footwear","Footwear"),
-    ("Accessories","Accessories"),
-)
 
-class user_new(models.Model):
-    Username = models.CharField(max_length=200)
-    Email = models.CharField(max_length=200)
-    
-
-class user_files(models.Model):
-    image = models.ImageField(upload_to='user_images')
-    gender= models.CharField(max_length=200)
-    category=models.CharField(max_length=200)
-    color=models.CharField(max_length=200)
-    occassion=models.CharField(max_length=200)
 
 
 class new_user(models.Model):
     u_id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     username = models.CharField(max_length=200)
     email = models.CharField(max_length=200)
-    Gender=models.CharField(max_length=200)
+    Type=models.CharField(max_length=200)
     def __str__(self):
         return self.username
 
 
-class Wardrobe(models.Model):
-    w_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique identifier for each image
-    u_id = models.ForeignKey(new_user, on_delete=models.CASCADE)  # Link to the user (ForeignKey)
-    img_path = models.ImageField(upload_to='user_images')
-    image_name = models.CharField(max_length=1000)
 
-    def __str__(self):
-        return self.image_name
-
-
-class Rec(models.Model):
-    rec_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID for recommendation
-    u_id = models.ForeignKey(new_user, on_delete=models.CASCADE)  # Link to the user (ForeignKey)
-    c_id = models.ForeignKey('Category', on_delete=models.CASCADE)  # Link to a category (ForeignKey)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"Recommendation {self.rec_id} for User {self.u_id}"
-
-class Category(models.Model):
-    c_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID for category
-    w_id = models.ForeignKey(Wardrobe, on_delete=models.CASCADE)  # Link to wardrobe (ForeignKey)
-    u_id = models.ForeignKey(new_user, on_delete=models.CASCADE)  # Link to user (ForeignKey)
-    Category = models.CharField(max_length=200)
-    Color = models.CharField(max_length=200)
-    Occassion = models.CharField(max_length=200)
-
-    def __str__(self):
-        return f"Category {self.Category} for {self.Occassion}"
-
-class Favourites(models.Model):
-    f_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID for favorite
-    u_id = models.ForeignKey(new_user, on_delete=models.CASCADE)  # Link to user (ForeignKey)
-    c_id = models.ForeignKey(Category, on_delete=models.CASCADE)  # Link to category (ForeignKey)
-
-    def __str__(self):
-        return f"Favorite {self.f_id} for User {self.u_id}"
 from django.db import models
 
-class Question(models.Model):
-    text = models.CharField(max_length=255)
-    option_1 = models.CharField(max_length=100)
-    option_2 = models.CharField(max_length=100)
-    option_3 = models.CharField(max_length=100)
-    option_4 = models.CharField(max_length=100)
+class Restaurant(models.Model):
+    location = models.CharField(max_length=255)
+    locality = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    cuisine = models.TextField()
+    rating = models.FloatField()
+    votes = models.IntegerField()
+    cost = models.FloatField()
 
-class UserAnswer(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    answer = models.CharField(max_length=100)
+    def __str__(self):
+        return f"{self.locality} - {self.city} (Rating: {self.rating})"
+
+
+class Event(models.Model):
+    type_of_food = models.CharField(max_length=255)
+    number_of_guests = models.IntegerField()
+    event_type = models.CharField(max_length=100)
+    quantity_of_food = models.FloatField()
+    storage_conditions = models.CharField(max_length=100)
+    purchase_history = models.CharField(max_length=100)
+    seasonality = models.CharField(max_length=100)
+    preparation_method = models.CharField(max_length=100)
+    geographical_location = models.CharField(max_length=100)
+    pricing = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.event_type} - {self.geographical_location}"
+    
+class NGO(models.Model):
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    contact_info = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class Transaction(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE, related_name="transactions")
+    ngo = models.ForeignKey(NGO, on_delete=models.CASCADE, related_name="transactions")
+    amount_of_food_donated = models.FloatField()  # in kilograms
+    donation_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.restaurant.locality} -> {self.ngo.name} ({self.amount_of_food_donated} kg)"
+    
+class CurrentBalance(models.Model):
+    restaurant = models.OneToOneField(Restaurant, on_delete=models.CASCADE, null=True, blank=True, related_name="balance")
+    ngo = models.OneToOneField(NGO, on_delete=models.CASCADE, null=True, blank=True, related_name="balance")
+    current_capacity = models.FloatField(null=True, blank=True)  # for restaurants
+    current_requirement = models.FloatField(null=True, blank=True)  # for NGOs
+
+    def __str__(self):
+        if self.restaurant:
+            return f"Restaurant: {self.restaurant.locality} (Capacity: {self.current_capacity} kg)"
+        elif self.ngo:
+            return f"NGO: {self.ngo.name} (Requirement: {self.current_requirement} kg)"
+        return "Balance Record"
 

@@ -1,86 +1,77 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
-from .models import new_user, Category, Wardrobe
+
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django.shortcuts import render
-from .models import Wardrobe, Category, Favourites, new_user,Rec
+
 from django.db.models import Count
 from django.utils import timezone
 from django.shortcuts import render, redirect
-from .models import Question, UserAnswer
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.shortcuts import render
 import pandas as pd
+from django.shortcuts import render
+from django.http import JsonResponse
 import joblib
+import pandas as pd
 
-# Load your pre-trained ML model, encoder, and scaler
-model = joblib.load('static/Model/wastage_model.pkl')
-encoder = joblib.load('static/Model/encoder.pkl')
-scaler = joblib.load('static/Model/scaler.pkl')
-
+from django.shortcuts import render
+from .models import Restaurant, Event
+import joblib
+import pandas as pd
 
 def upload(request):
-    prediction = None
-
     if request.method == 'POST':
-        # Retrieve the common fields
         category = request.POST.get('category')
-        location = request.POST.get('location')
-        locality = request.POST.get('locality')
-        city = request.POST.get('city')
-        cuisine = request.POST.get('cuisine')
+        print(category)
+        if category == 'event':
+            # Extract and save Event data
+            event = Event.objects.create(
+                type_of_food=request.POST.get('type_of_food'),
+                number_of_guests=int(request.POST.get('number_of_guests')),
+                event_type=request.POST.get('event_type'),
+                quantity_of_food=float(request.POST.get('quantity_of_food')),
+                storage_conditions=request.POST.get('storage_conditions'),
+                purchase_history=request.POST.get('purchase_history'),
+                seasonality=request.POST.get('seasonality'),
+                preparation_method=request.POST.get('preparation_method'),
+                geographical_location=request.POST.get('geographical_location'),
+                pricing=request.POST.get('pricing'),
+            )
+            event.save()
 
-        # Retrieve the specific fields based on the category
-        if category == 'restaurant':
-            rating = float(request.POST.get('rating', 0))
-            votes = int(request.POST.get('votes', 0))
-            cost = float(request.POST.get('cost', 0))
-            data = pd.DataFrame([{
-                'Location': location,
-                'Locality': locality,
-                'City': city,
-                'Cuisine': cuisine,
-                'Rating': rating,
-                'Votes': votes,
-                'Cost': cost,
-            }])
-        elif category == 'event':
-            attendees = int(request.POST.get('attendees', 0))
-            duration = float(request.POST.get('duration', 0))
-            food_wastage = float(request.POST.get('food_wastage', 0))
-            data = pd.DataFrame([{
-                'Location': location,
-                'Locality': locality,
-                'City': city,
-                'Cuisine': cuisine,
-                'Attendees': attendees,
-                'Duration': duration,
-                'Food Wastage': food_wastage,
-            }])
+            # Load the model and predict
+            event_model = joblib.load('event_model.pkl')
+            # Preprocess and predict (similar to earlier code)
 
-        # Preprocess data
-        data_encoded = pd.DataFrame(encoder.transform(data.select_dtypes(include=['object'])))
-        data_encoded.columns = encoder.get_feature_names_out(data.select_dtypes(include=['object']).columns)
-        
-        numerical_cols = data.select_dtypes(include=['int64', 'float64']).columns
-        if not numerical_cols.empty:
-            data_scaled = pd.DataFrame(scaler.transform(data[numerical_cols]), columns=numerical_cols)
-        else:
-            data_scaled = pd.DataFrame()
+        elif category == 'restaurant':
+            # Extract and save Restaurant data
+            restaurant = Restaurant.objects.create(
+                location=request.POST.get('location'),
+                locality=request.POST.get('locality'),
+                city=request.POST.get('city'),
+                cuisine=request.POST.get('cuisine'),
+                rating=float(request.POST.get('rating')),
+                votes=int(request.POST.get('votes')),
+                cost=float(request.POST.get('cost')),
+            )
+            restaurant.save()
 
-        data_preprocessed = pd.concat([data_scaled, data_encoded], axis=1)
-        data_preprocessed = data_preprocessed.reindex(columns=model.feature_names_in_, fill_value=0)
+            # Load the model and predict
+            restaurant_model = joblib.load('restaurant_model.pkl')
+            # Preprocess and predict (similar to earlier code)
 
-        # Predict using the ML model
-        prediction = model.predict(data_preprocessed)[0]
+        # Render the result
+        return render(request, 'upload.html', {'prediction': prediction[0]})
 
-    return render(request, 'upload_details.html', {'prediction': prediction})
+    return render(request, 'upload.html')
 
 
 def insights(request):
