@@ -14,9 +14,94 @@ from django.utils import timezone
 from django.shortcuts import render, redirect
 from .models import Question, UserAnswer
 from django.contrib.auth.decorators import login_required
-
-# Create your views here.
 from django.shortcuts import render
+from django.shortcuts import render
+import pandas as pd
+import joblib
+
+# Load your pre-trained ML model, encoder, and scaler
+model = joblib.load('static/Model/wastage_model.pkl')
+encoder = joblib.load('static/Model/encoder.pkl')
+scaler = joblib.load('static/Model/scaler.pkl')
+
+
+def upload(request):
+    prediction = None
+
+    if request.method == 'POST':
+        # Retrieve the common fields
+        category = request.POST.get('category')
+        location = request.POST.get('location')
+        locality = request.POST.get('locality')
+        city = request.POST.get('city')
+        cuisine = request.POST.get('cuisine')
+
+        # Retrieve the specific fields based on the category
+        if category == 'restaurant':
+            rating = float(request.POST.get('rating', 0))
+            votes = int(request.POST.get('votes', 0))
+            cost = float(request.POST.get('cost', 0))
+            data = pd.DataFrame([{
+                'Location': location,
+                'Locality': locality,
+                'City': city,
+                'Cuisine': cuisine,
+                'Rating': rating,
+                'Votes': votes,
+                'Cost': cost,
+            }])
+        elif category == 'event':
+            attendees = int(request.POST.get('attendees', 0))
+            duration = float(request.POST.get('duration', 0))
+            food_wastage = float(request.POST.get('food_wastage', 0))
+            data = pd.DataFrame([{
+                'Location': location,
+                'Locality': locality,
+                'City': city,
+                'Cuisine': cuisine,
+                'Attendees': attendees,
+                'Duration': duration,
+                'Food Wastage': food_wastage,
+            }])
+
+        # Preprocess data
+        data_encoded = pd.DataFrame(encoder.transform(data.select_dtypes(include=['object'])))
+        data_encoded.columns = encoder.get_feature_names_out(data.select_dtypes(include=['object']).columns)
+        
+        numerical_cols = data.select_dtypes(include=['int64', 'float64']).columns
+        if not numerical_cols.empty:
+            data_scaled = pd.DataFrame(scaler.transform(data[numerical_cols]), columns=numerical_cols)
+        else:
+            data_scaled = pd.DataFrame()
+
+        data_preprocessed = pd.concat([data_scaled, data_encoded], axis=1)
+        data_preprocessed = data_preprocessed.reindex(columns=model.feature_names_in_, fill_value=0)
+
+        # Predict using the ML model
+        prediction = model.predict(data_preprocessed)[0]
+
+    return render(request, 'upload_details.html', {'prediction': prediction})
+
+
+def insights(request):
+    # Example data for insights
+    insights_data = {
+        "total_donations": 120,
+        "total_ngo": 30,
+        "total_restaurants": 50,
+        "most_active_ngo": "Helping Hands",
+        "most_generous_restaurant": "Foodie's Delight",
+    }
+    return render(request, 'insights.html', insights_data)
+
+def view_donations(request):
+    # Example donation data
+    donations = [
+        {"donor": "Restaurant A", "recipient": "NGO 1", "quantity": "50 meals", "date": "2024-11-20"},
+        {"donor": "Restaurant B", "recipient": "NGO 2", "quantity": "30 meals", "date": "2024-11-22"},
+        {"donor": "Event C", "recipient": "NGO 3", "quantity": "100 meals", "date": "2024-11-25"},
+    ]
+    return render(request, 'view_donations.html', {"donations": donations})
 
 def map_view(request):
     # Sample data (replace with database queries)
@@ -276,15 +361,15 @@ def view_wardrobe(request):
     return render(request, 'view_wardrobe.html', {'items': user_items, 'categories': user_categories})
 
 
-def insights(request):
-    # Aggregate data: Count how many times each occasion appears in `rec`
-    data_of_cat = (Rec.objects.values('c_id__Occassion')  # Use the related name
-                  .annotate(total=Count('c_id'))
-                  .order_by('c_id__Occassion'))
-    print("data is :",data_of_cat)
-    # Prepare data for Chart.js
-    occasions = [entry['c_id__Occassion'] for entry in data_of_cat]
-    counts_of_ocassions = [entry['total'] for entry in data_of_cat]
+# def insights(request):
+#     # Aggregate data: Count how many times each occasion appears in `rec`
+#     data_of_cat = (Rec.objects.values('c_id__Occassion')  # Use the related name
+#                   .annotate(total=Count('c_id'))
+#                   .order_by('c_id__Occassion'))
+#     print("data is :",data_of_cat)
+#     # Prepare data for Chart.js
+#     occasions = [entry['c_id__Occassion'] for entry in data_of_cat]
+#     counts_of_ocassions = [entry['total'] for entry in data_of_cat]
 
     # data_of_cat_wardrobe = (Wardrobe.objects.values('c_id__Occassion')  # Use the related name
     #               .annotate(total=Count('c_id'))
@@ -294,41 +379,41 @@ def insights(request):
     # occasions = [entry['c_id__Occassion'] for entry in data_of_cat]
     # counts_of_ocassions = [entry['total'] for entry in data_of_cat]
 
-    data_of_color = (Rec.objects.values('c_id__Color')  # Use the related name
-                  .annotate(total=Count('c_id'))
-                  .order_by('c_id__Color'))
-    print("data_of_color is :",data_of_color)
-    # Prepare data for Chart.js
-    colors = [entry['c_id__Color'] for entry in data_of_color]
-    counts_of_colors = [entry['total'] for entry in data_of_color]
+    # data_of_color = (Rec.objects.values('c_id__Color')  # Use the related name
+    #               .annotate(total=Count('c_id'))
+    #               .order_by('c_id__Color'))
+    # print("data_of_color is :",data_of_color)
+    # # Prepare data for Chart.js
+    # colors = [entry['c_id__Color'] for entry in data_of_color]
+    # counts_of_colors = [entry['total'] for entry in data_of_color]
 
-    fav_Color_data = (Favourites.objects.values('c_id__Color')  # Use the related name
-                  .annotate(total=Count('c_id'))
-                  .order_by('c_id__Color'))
-    fav_colors = [entry['c_id__Color'] for entry in fav_Color_data]
-    fav_counts_of_colors = [entry['total'] for entry in fav_Color_data]
+    # fav_Color_data = (Favourites.objects.values('c_id__Color')  # Use the related name
+    #               .annotate(total=Count('c_id'))
+    #               .order_by('c_id__Color'))
+    # fav_colors = [entry['c_id__Color'] for entry in fav_Color_data]
+    # fav_counts_of_colors = [entry['total'] for entry in fav_Color_data]
 
 
-    fav_Cat_data = (Favourites.objects.values('c_id__Occassion')  # Use the related name
-                  .annotate(total=Count('c_id'))
-                  .order_by('c_id__Occassion'))
-    fav_cat = [entry['c_id__Occassion'] for entry in fav_Cat_data]
-    fav_counts_of_cat = [entry['total'] for entry in fav_Cat_data]
+    # fav_Cat_data = (Favourites.objects.values('c_id__Occassion')  # Use the related name
+    #               .annotate(total=Count('c_id'))
+    #               .order_by('c_id__Occassion'))
+    # fav_cat = [entry['c_id__Occassion'] for entry in fav_Cat_data]
+    # fav_counts_of_cat = [entry['total'] for entry in fav_Cat_data]
 
-    context = {
-        'occasions': occasions,
-        'counts_of_ocassions': counts_of_ocassions,
-        'colors':colors,
-        'counts_of_colors':counts_of_colors,
-        'fav_counts_of_colors':fav_counts_of_colors,
-        'fav_colors':fav_colors,
-        'fav_cat':fav_cat,
-        'fav_counts_of_cat':fav_counts_of_cat,
+    # context = {
+    #     'occasions': occasions,
+    #     'counts_of_ocassions': counts_of_ocassions,
+    #     'colors':colors,
+    #     'counts_of_colors':counts_of_colors,
+    #     'fav_counts_of_colors':fav_counts_of_colors,
+    #     'fav_colors':fav_colors,
+    #     'fav_cat':fav_cat,
+    #     'fav_counts_of_cat':fav_counts_of_cat,
 
-    }
-    # print("occasions is :",occasions)
-    # print("counts_of_ocassions is :",counts_of_ocassions)
-    return render(request, 'insights.html', context) 
+    # }
+    # # print("occasions is :",occasions)
+    # # print("counts_of_ocassions is :",counts_of_ocassions)
+    # return render(request, 'insights.html', context) 
 
 
 def favourite(request):

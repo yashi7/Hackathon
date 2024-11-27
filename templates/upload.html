@@ -3,98 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Wastage Prediction</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
+    <title>Upload Details</title>
+    <script>
+        function toggleFields() {
+            const category = document.querySelector('input[name="category"]:checked').value;
+            document.getElementById('restaurant-fields').style.display = category === 'restaurant' ? 'block' : 'none';
+            document.getElementById('event-fields').style.display = category === 'event' ? 'block' : 'none';
         }
-        .form-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-title {
-            font-weight: bold;
-            color: #007bff;
-        }
-        .navbar {
-            margin-bottom: 20px;
-        }
-        footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
-            background: #007bff;
-            color: white;
-        }
-    </style>
+    </script>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Food Wastage Predictor</a>
+    <h1>Upload Details</h1>
+    <form action="/upload/" method="POST">
+        {% csrf_token %}
+        <label>
+            <input type="radio" name="category" value="restaurant" onchange="toggleFields()" checked>
+            Restaurant
+        </label>
+        <label>
+            <input type="radio" name="category" value="event" onchange="toggleFields()">
+            Event
+        </label>
+        
+        <div>
+            <label>Location: <input type="text" name="location" required></label>
+            <label>Locality: <input type="text" name="locality" required></label>
+            <label>City: <input type="text" name="city" required></label>
+            <label>Cuisine: <input type="text" name="cuisine" required></label>
         </div>
-    </nav>
 
-    <div class="container">
-        <!-- Form Section -->
-        <div class="form-container">
-            <h2 class="form-title text-center">Enter Event Details</h2>
-            <form method="POST" action="">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="type_of_food" class="form-label">Type of Food</label>
-                    <input type="text" class="form-control" id="type_of_food" name="type_of_food" placeholder="e.g., Vegetables" required>
-                </div>
-                <div class="mb-3">
-                    <label for="number_of_guests" class="form-label">Number of Guests</label>
-                    <input type="number" class="form-control" id="number_of_guests" name="number_of_guests" placeholder="e.g., 3000" required>
-                </div>
-                <div class="mb-3">
-                    <label for="event_type" class="form-label">Event Type</label>
-                    <input type="text" class="form-control" id="event_type" name="event_type" placeholder="e.g., Wedding" required>
-                </div>
-                <div class="mb-3">
-                    <label for="quantity_of_food" class="form-label">Quantity of Food</label>
-                    <input type="number" step="0.01" class="form-control" id="quantity_of_food" name="quantity_of_food" placeholder="e.g., 4500" required>
-                </div>
-                <div class="mb-3">
-                    <label for="storage_conditions" class="form-label">Storage Conditions</label>
-                    <input type="text" class="form-control" id="storage_conditions" name="storage_conditions" placeholder="e.g., Refrigerated" required>
-                </div>
-                <div class="mb-3">
-                    <label for="purchase_history" class="form-label">Purchase History</label>
-                    <input type="text" class="form-control" id="purchase_history" name="purchase_history" placeholder="e.g., Regular" required>
-                </div>
-                <div class="mb-3">
-                    <label for="seasonality" class="form-label">Seasonality</label>
-                    <input type="text" class="form-control" id="seasonality" name="seasonality" placeholder="e.g., Winter" required>
-                </div>
-                <div class="mb-3">
-                    <label for="preparation_method" class="form-label">Preparation Method</label>
-                    <input type="text" class="form-control" id="preparation_method" name="preparation_method" placeholder="e.g., Buffet" required>
-                </div>
-                <div class="mb-3">
-                    <label for="geographical_location" class="form-label">Geographical Location</label>
-                    <input type="text" class="form-control" id="geographical_location" name="geographical_location" placeholder="e.g., Urban" required>
-                </div>
-                <div class="mb-3">
-                    <label for="pricing" class="form-label">Pricing</label>
-                    <input type="text" class="form-control" id="pricing" name="pricing" placeholder="e.g., Low" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Predict Wastage</button>
-            </form>
+        <!-- Restaurant-specific fields -->
+        <div id="restaurant-fields">
+            <h3>Restaurant Details</h3>
+            <label>Rating: <input type="number" step="0.1" name="rating"></label>
+            <label>Votes: <input type="number" name="votes"></label>
+            <label>Cost: <input type="number" name="cost"></label>
         </div>
-    </div>
 
-    <footer>
-        <p>&copy; 2024 Food Wastage Predictor. All rights reserved.</p>
-    </footer>
+        <!-- Event-specific fields -->
+        <div id="event-fields" style="display: none;">
+            <h3>Event Details</h3>
+            <label>Attendees: <input type="number" name="attendees"></label>
+            <label>Duration (hours): <input type="number" step="0.1" name="duration"></label>
+            <label>Food Wastage (kg): <input type="number" step="0.1" name="food_wastage"></label>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    {% if prediction %}
+        <h2>Predicted Extra Food Amount: {{ prediction }}</h2>
+    {% endif %}
 </body>
 </html>

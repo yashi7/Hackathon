@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from Fashion.views import index,login_view,signup,aboutus,upload,profile,recommendation,view_wardrobe,insights,favourite,add_to_favorites, remove_outfit, remove_from_wardrobe,quiz,result,map_view
+from Fashion.views import index,login_view,signup,aboutus,upload,profile,insights,favourite,add_to_favorites, remove_outfit, remove_from_wardrobe,quiz,result,map_view,view_donations
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LogoutView
@@ -34,10 +34,9 @@ urlpatterns = [
     path('signup/',signup,name='signup'), 
     path('aboutus/',aboutus,name='aboutus'),
     path('upload/',upload,name='upload'),
-    
     path('profile/',profile,name='profile'),
     # path('recommendation/',recommendation,name='recommendation'),
-    path('view_wardrobe/', view_wardrobe, name='view_wardrobe'),
+    # path('view_wardrobe/', view_wardrobe, name='view_wardrobe'),
     path('insights/', insights, name='insights'),
     path('favourite/', favourite, name='favourite'), 
     path('add_to_favorites/<uuid:category_id>/', add_to_favorites, name='add_to_favorites'),
@@ -47,6 +46,8 @@ urlpatterns = [
     path('favourite/', favourite, name='favourite'),
     path('quiz/', quiz, name='quiz'),  # Path for the quiz page
     path('result/', result, name='result'),
+    path('insights/', insights, name='insights'),
+    path('view-donations/', view_donations, name='view_donations'),
     # Other URL patterns
 ]
 
